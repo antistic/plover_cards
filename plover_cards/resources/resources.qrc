@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plover_cards">
+        <file>cards.svg</file>
+    </qresource>
+</RCC>
