@@ -3,7 +3,7 @@
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code.
-extension-pkg-whitelist=
+extension-pkg-whitelist=PyQt5.QtCore,PyQt5.QtGui,PyQt5.QtWidgets
 
 # Specify a score threshold to be exceeded before program exits with error.
 fail-under=10.0
@@ -14,7 +14,7 @@ ignore=CVS
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
-ignore-patterns=
+ignore-patterns=.*_ui.py,.*_rc.py
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
@@ -138,7 +138,15 @@ disable=print-statement,
         xreadlines-attribute,
         deprecated-sys-function,
         exception-escape,
-        comprehension-escape
+        comprehension-escape,
+
+        # we'll let `black` deal with this
+        line-too-long,
+
+        # TODO: re-enable when we add docstrings
+        missing-module-docstring,
+        missing-class-docstring,
+        missing-function-docstring,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -250,7 +258,8 @@ good-names=i,
            k,
            ex,
            Run,
-           _
+           _,
+           f
 
 # Good variable names regexes, separated by a comma. If names match any regex,
 # they will always be accepted
