@@ -30,82 +30,17 @@ def get_new_notes(new_notes_file):
     reader = csv.reader(lines)
     result = {}
     for line in reader:
-        result[line[0]] = line[1]
+        if len(line) == 2:
+            result[line[0]] = line[1]
 
     return result
-
-
-def get_suggestions_from_strokes_log(strokes_path, suggestions, ignored):
-    strokes_pattern = re.compile(r".* Translation\(\((.*)\) : \"(.*)\"\)")
-    ignore_endings = ["s", "ed", "ing"]
-    word_ignore_patterns = [
-        re.compile(rf" {{\^{ending}}}$") for ending in ignore_endings
-    ]
-    word_ignore_patterns.append(re.compile(r"\{\^\~\|\^\}"))  # retroactively add space
-
-    def parse_stroke(s):
-        match = strokes_pattern.match(s)
-
-        if match:
-            word = match.group(2).strip()
-            for pattern in word_ignore_patterns:
-                if pattern.search(word):
-                    return None
-
-            strokes = match.group(1).replace("'", "")
-            # remove trailing comma
-            strokes = re.sub(r",$", "", strokes)
-            strokes = strokes.split(", ")
-            strokes = ["/".join(strokes)]
-
-            return (word, strokes)
-        return None
-
-    strokes = strokes_path.read_text().splitlines()
-    for line in strokes:
-        result = parse_stroke(line)
-        if result:
-            (word, strokes) = result
-            if word and word not in ignored:
-                if word in suggestions:
-                    suggestions[word] = suggestions[word].union(strokes)
-                else:
-                    suggestions[word] = set(strokes)
-
-    return suggestions
-
-
-def add_improvements_from_clippy(clippy_path, suggestions, ignored):
-    shorter_stroke_pattern = re.compile(r"\[.*\] (.*)\|\|.*-> (.*)")
-
-    def parse_shorter_stroke(s):
-        match = shorter_stroke_pattern.match(s)
-        if match:
-            return (
-                match.group(1).strip(),
-                match.group(2).split(", "),
-            )
-
-    # add improvements
-    shorter_strokes = clippy_path.read_text().splitlines()
-    for line in shorter_strokes:
-        result = parse_shorter_stroke(line)
-        if result:
-            (word, strokes) = result
-            if word and word not in ignored:
-                if word in suggestions:
-                    suggestions[word] = suggestions[word].union(strokes)
-                elif len(word.split(" ")) > 1:
-                    # only add improvements for unknown phrases, not unknown words
-                    suggestions[word] = set(strokes)
-
-    return suggestions
 
 
 @dataclass
 class Card:
     translation: str
     stroke_suggestions: list[str]
+    frequency: int
     chosen_strokes: str = None
     ignored: bool = False
     similar_ignored: list[str] = field(default_factory=list)
@@ -158,22 +93,24 @@ def possible_roots(word):
     return possible_roots
 
 
-def create_suggestions(strokes_path, clippy_path, ignored, new_notes):
-    suggestions = {}
-    suggestions = get_suggestions_from_strokes_log(strokes_path, suggestions, ignored)
-    suggestions = add_improvements_from_clippy(clippy_path, suggestions, ignored)
+def create_cards(card_suggestions, ignored, new_notes):
+    suggestions = card_suggestions.card_suggestions
 
-    suggestions = [
-        Card(
-            translation=k,
-            stroke_suggestions=sorted(list(v), key=strokes_sort_key),
-            chosen_strokes=new_notes.get(k, None),
-            similar_ignored=list(possible_roots(k).intersection(ignored)),
-        )
-        for k, v in sorted(suggestions.items(), key=lambda x: x[0].lower())
-    ]
+    cards = []
+    for k, v in sorted(suggestions.items(), key=lambda x: x[0].lower()):
+        if k in ignored:
+            card_suggestions.delete(k)
+        else:
+            card = Card(
+                translation=k,
+                stroke_suggestions=sorted(list(v["strokes"]), key=strokes_sort_key),
+                frequency=v["frequency"],
+                chosen_strokes=new_notes.get(k, None),
+                similar_ignored=list(possible_roots(k).intersection(ignored)),
+            )
+            cards.append(card)
 
-    return suggestions
+    return cards
 
 
 class Cards:
@@ -181,13 +118,10 @@ class Cards:
         self,
         anki_path,
         card_type,
-        clippy_path,
-        strokes_path,
         ignore_path,
         output_path,
+        card_suggestions,
     ):
-        self.clippy_path = Path(clippy_path)
-        self.strokes_path = Path(strokes_path)
         self.ignore_path = Path(ignore_path)
         self.output_path = Path(output_path)
 
@@ -195,9 +129,8 @@ class Cards:
         self.ignored = get_ignored_from_file(self.ignore_path)
 
         new_notes = get_new_notes(self.output_path)
-        self.cards = create_suggestions(
-            Path(strokes_path),
-            Path(clippy_path),
+        self.cards = create_cards(
+            card_suggestions,
             existing_notes.union(self.ignored),
             new_notes,
         )
@@ -229,12 +162,6 @@ class Cards:
         all_ignored = self.ignored.union(self.new_ignored)
         self.ignore_path.parent.mkdir(parents=True, exist_ok=True)
         self.ignore_path.write_text("\n".join(sorted(list(all_ignored))))
-
-    def clear_strokes(self):
-        self.strokes_path.write_text("")
-
-    def clear_clippy(self):
-        self.clippy_path.write_text("")
 
     def _as_notes(self):
         return "\n".join(

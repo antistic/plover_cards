@@ -13,6 +13,7 @@ from .anki_utils import ANKI_BASE_DIR, get_models
 from .cards import Cards
 from .config import read_config, save_config
 from .card_builder_ui import Ui_CardBuilder
+from .card_suggestions import CardSuggestions
 
 
 class CardTableModel(QtCore.QAbstractTableModel):
@@ -64,6 +65,15 @@ class CardBuilder(Tool, Ui_CardBuilder):
 
     def __init__(self, engine):
         super(CardBuilder, self).__init__(engine)
+        self.engine = engine
+
+        hook = self.engine._running_extensions.get("plover_cards_hook")
+        if hook:
+            self.card_suggestions = hook.card_suggestions
+            self.card_suggestions.save()
+        else:
+            self.card_suggestions = CardSuggestions()
+
         self.setupUi(self)
 
         self.config = read_config()
@@ -90,26 +100,6 @@ class CardBuilder(Tool, Ui_CardBuilder):
                 "Open Anki collection",
                 ANKI_BASE_DIR,
                 "Anki Collections (*.anki2)",
-            )
-        )
-
-        self.clippy_path.setText(self.config["paths"]["clippy"])
-        self.clippy_browse.clicked.connect(
-            self.on_browse(
-                self.clippy_path,
-                "Open clippy file",
-                PLOVER_CONFIG_DIR,
-                "Text Files (*.txt)",
-            )
-        )
-
-        self.strokes_path.setText(self.config["paths"]["strokes_log"])
-        self.strokes_browse.clicked.connect(
-            self.on_browse(
-                self.strokes_path,
-                "Open strokes log",
-                PLOVER_CONFIG_DIR,
-                "Log Files (*.log)",
             )
         )
 
@@ -152,8 +142,6 @@ class CardBuilder(Tool, Ui_CardBuilder):
     def setup_disable_start_if_invalid(self):
         text_inputs = [
             self.anki_path,
-            self.clippy_path,
-            self.strokes_path,
             self.ignore_path,
             self.output_path,
         ]
@@ -178,7 +166,6 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.ignore_card.clicked.connect(self.on_ignore_card)
         self.clear_card.clicked.connect(self.on_clear_card)
         self.finish.clicked.connect(self.on_finish)
-        self.save.clicked.connect(self.on_save)
 
     def setup_suggestions(self):
         self.suggestions_model = QtGui.QStandardItemModel(self.suggestions)
@@ -189,10 +176,9 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.cards = Cards(
             self.anki_path.text(),
             self.card_type.currentData(),
-            self.clippy_path.text(),
-            self.strokes_path.text(),
             self.ignore_path.text(),
             self.output_path.text(),
+            self.card_suggestions,
         )
         self.current_card_index = 0
         self.card_view_model = CardTableModel(self.card_view)
@@ -206,8 +192,6 @@ class CardBuilder(Tool, Ui_CardBuilder):
     def on_start(self):
         self.config["paths"] = {
             "anki_collection": self.anki_path.text(),
-            "clippy": self.clippy_path.text(),
-            "strokes_log": self.strokes_path.text(),
             "ignore": self.ignore_path.text(),
             "output": self.output_path.text(),
         }
@@ -222,7 +206,8 @@ class CardBuilder(Tool, Ui_CardBuilder):
             Path(self.output_path.text()).write_text("")
 
         self.pages.setCurrentIndex(1)
-        self.show_card()
+        if len(self.cards) > 0:
+            self.show_card()
 
     def show_card(self):
         if self.current_card_index == 0:
@@ -291,22 +276,8 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.show_card()
 
     def on_finish(self):
-        self.clear_strokes.setChecked(self.config["options"]["clear_strokes"] == "True")
-        self.clear_clippy.setChecked(self.config["options"]["clear_clippy"] == "True")
-        self.pages.setCurrentIndex(2)
-        self.save.setFocus()
-
-    def on_save(self):
         self.cards.save()
-
-        self.config["options"]["clear_strokes"] = str(self.clear_strokes.isChecked())
-        self.config["options"]["clear_clippy"] = str(self.clear_clippy.isChecked())
         save_config(self.config)
-
-        if self.clear_strokes.isChecked():
-            self.cards.clear_strokes()
-        if self.clear_clippy.isChecked():
-            self.cards.clear_clippy()
         self.close()
 
 

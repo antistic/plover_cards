@@ -12,10 +12,8 @@ Make sure Anki isn't already running.
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Anki Collection                   | The Anki collection with existing cards, which will be ignored when building cards                                                                                           |
 | Card Type                         | The card type for existing cards, which will be ignored when building cards                                                                                                  |
-| clippy.txt                        | The output of  [plover-clippy](https://github.com/tckmn/plover_clippy), used to suggest stroke improvements                                                                  |
-| strokes.log                       | The stroke log,  used to find new words. It must have "log translations" turned on                                                                                           |
-| ignore file                       | Where to save the list of words to ignore                                                                                                                                    |
-| output file                       | Where to save the CSV file of new cards, which can  then be imported into Anki                                                                                               |
+| Ignore File                       | Where to save the list of words to ignore                                                                                                                                    |
+| Output File                       | Where to save the CSV file of new cards, which can  then be imported into Anki                                                                                               |
 | Clear output file before starting | Clear the output file when you press start. You'll want this on if you have imported the cards from the previous session, and off if you're continuing the previous session. |
 
 These options are saved in `{your_plover_config_folder}/plover_cards.cfg`
@@ -33,14 +31,3 @@ These options are saved in `{your_plover_config_folder}/plover_cards.cfg`
   - **<**: Go to previous card.
   - **>**: Go to next card.
   - **Finish**: Finish building cards.
-
-### Clean Up
-
-| Option        | What it's used for         |
-| ------------- | -------------------------- |
-| clear clippy  | Clear the clippy file      |
-| clear strokes | Clear the strokes log file |
-
-These options are saved in `{your_plover_config_folder}/plover_cards.cfg`
-
-- **Save**: Save cards to the output file

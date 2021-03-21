@@ -11,8 +11,6 @@ def read_config():
     config = configparser.ConfigParser()
 
     config["paths"] = {
-        "clippy": str(Path(PLOVER_CONFIG_DIR, "clippy.txt")),
-        "strokes_log": str(Path(PLOVER_CONFIG_DIR, "strokes.log")),
         "ignore": str(Path(PLOVER_CONFIG_DIR, "plover_cards", "ignore.txt")),
         "output": str(Path(PLOVER_CONFIG_DIR, "plover_cards", "new_notes.txt")),
     }
@@ -24,8 +22,6 @@ def read_config():
 
     config["options"] = {
         "clear_output_on_start": "False",
-        "clear_clippy": "False",
-        "clear_strokes": "False",
     }
 
     if not CONFIG_PATH.exists():
