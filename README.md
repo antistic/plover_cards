@@ -6,7 +6,17 @@ This plugin might not work perfectly, so you may want to double check the cards 
 
 ## Usage
 
-Make sure Anki isn't already running.
+### Before you start
+
+- Enable the plugin
+  - Right click the Plover icon, "Configure", "Plugins" tab, check the box next to "plover_cards_hook", "Apply"
+- Set up Anki
+  - Make an Anki collection
+  - Make a card type for your steno cards (it can be the default "Basic" type, but if you want to use Anki for anything else as well then you should make a new card type)
+- Use Plover and type some words that aren't in Anki
+- Start the card builder
+  - Make sure Anki isn't already running
+  - Right click the Plover icon, "Tools", "Card Builder"
 
 ### Set Options
 
