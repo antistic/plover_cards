@@ -1,8 +1,6 @@
 import re
 
-from plover.engine import StenoEngine
 from plover.formatting import RetroFormatter
-from plover.suggestions import Suggestion
 
 from .card_suggestions import CardSuggestions
 
@@ -38,11 +36,11 @@ class Main:
         self.engine.hook_disconnect("translated", self._on_translated)
         self.card_suggestions.save()
 
-    def _on_translated(self, old, new):
+    def _on_translated(self, _old, new):
         """https://github.com/openstenoproject/plover/blob/91a84e16403e9d7470d0192c3b5484e422060a0b/plover/gui_qt/suggestions_dialog.py#L118"""
 
-        for a in reversed(new):
-            if a.text and not a.text.isspace():
+        for action in reversed(new):
+            if action.text and not action.text.isspace():
                 break
         else:
             return
@@ -58,5 +56,5 @@ class Main:
                 self.card_suggestions.add_suggestion(suggestion)
 
     def _on_translator_output(self, _undo, do, _prev):
-        for d in do:
-            self.card_suggestions.add_translation(d)
+        for translation in do:
+            self.card_suggestions.add_translation(translation)

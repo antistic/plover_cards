@@ -1,10 +1,8 @@
-import os
 from pathlib import Path
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
-from PyQt5 import uic
 
 from plover.oslayer.config import CONFIG_DIR as PLOVER_CONFIG_DIR
 from plover.gui_qt.tool import Tool
@@ -23,10 +21,10 @@ class CardTableModel(QtCore.QAbstractTableModel):
     def refresh_(self, card_index):
         self.dataChanged.emit(self.index(card_index, 0), self.index(card_index, 1))
 
-    def rowCount(self, parent):
+    def rowCount(self, _parent):
         return len(self.cards)
 
-    def columnCount(self, parent):
+    def columnCount(self, _parent):
         return 3
 
     def data(self, index, role):
@@ -146,8 +144,8 @@ class CardBuilder(Tool, Ui_CardBuilder):
             self.output_path,
         ]
 
-        def on_text_changed(str):
-            if str == "":
+        def on_text_changed(new_text):
+            if new_text == "":
                 self.start.setEnabled(False)
                 return
 
@@ -156,8 +154,8 @@ class CardBuilder(Tool, Ui_CardBuilder):
             else:
                 self.start.setEnabled(False)
 
-        for input in text_inputs:
-            input.textChanged.connect(on_text_changed)
+        for text_input in text_inputs:
+            text_input.textChanged.connect(on_text_changed)
 
     def setup_buttons(self):
         self.start.clicked.connect(self.on_start)

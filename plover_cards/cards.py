@@ -82,31 +82,31 @@ def possible_roots(word):
         ("eed$", "ee"),
     ]
 
-    possible_roots = set()
+    roots = set()
     for replacement in replacements:
         (root, count) = re.subn(replacement[0], replacement[1], word)
         if count > 0:
-            possible_roots.add(root)
+            roots.add(root)
 
-    possible_roots.add(word.lower())
+    roots.add(word.lower())
 
-    return possible_roots
+    return roots
 
 
 def create_cards(card_suggestions, ignored, new_notes):
     suggestions = card_suggestions.card_suggestions
 
     cards = []
-    for k, v in sorted(suggestions.items(), key=lambda x: x[0].lower()):
-        if k in ignored:
-            card_suggestions.delete(k)
+    for phrase, data in sorted(suggestions.items(), key=lambda x: x[0].lower()):
+        if phrase in ignored:
+            card_suggestions.delete(phrase)
         else:
             card = Card(
-                translation=k,
-                stroke_suggestions=sorted(list(v["strokes"]), key=strokes_sort_key),
-                frequency=v["frequency"],
-                chosen_strokes=new_notes.get(k, None),
-                similar_ignored=list(possible_roots(k).intersection(ignored)),
+                translation=phrase,
+                stroke_suggestions=sorted(list(data["strokes"]), key=strokes_sort_key),
+                frequency=data["frequency"],
+                chosen_strokes=new_notes.get(phrase, None),
+                similar_ignored=list(possible_roots(phrase).intersection(ignored)),
             )
             cards.append(card)
 
