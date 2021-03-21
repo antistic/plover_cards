@@ -2,11 +2,13 @@
 
 A Plover plugin which helps you build an Anki deck from the words and phrases you have typed.
 
+This plugin might not work perfectly, so you may want to double check the cards before you add them.
+
 ## Usage
 
 Make sure Anki isn't already running.
 
-### Options
+### Set Options
 
 | Option                            | What it's used for                                                                                                                                                           |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -18,7 +20,7 @@ Make sure Anki isn't already running.
 
 These options are saved in `{your_plover_config_folder}/plover_cards.cfg`
 
-### Building Screen
+### Build Cards
 
 - *Stroke list*: Pick which stroke you want on the back of the Anki card here.
 - *Card list*:
@@ -31,3 +33,7 @@ These options are saved in `{your_plover_config_folder}/plover_cards.cfg`
   - **<**: Go to previous card.
   - **>**: Go to next card.
   - **Finish**: Finish building cards.
+
+### Add to Anki
+
+In Anki go to `File` then `Import`. Select the output file you chose at the beginning (defaults to `{your_plover_config_folder}/plover_cards/new_notes.txt`).
