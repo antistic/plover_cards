@@ -12,7 +12,7 @@ This plugin might not work perfectly, so you may want to double check the cards 
   - Right click the Plover icon, "Configure", "Plugins" tab, check the box next to "plover_cards_hook", "Apply"
 - Set up Anki
   - Make an Anki collection
-  - Make a card type for your steno cards (it can be the default "Basic" type, but if you want to use Anki for anything else as well then you should make a new card type)
+  - Make a note type for your steno cards (it can be the default "Basic" type, but if you want to use Anki for anything else as well then you should make a new note type)
 - Use Plover and type some words that aren't in Anki
 - Start the card builder
   - Make sure Anki isn't already running
@@ -23,7 +23,7 @@ This plugin might not work perfectly, so you may want to double check the cards 
 | Option                            | What it's used for                                                                                                                                                           |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Anki Collection                   | The Anki collection with existing cards, which will be ignored when building cards                                                                                           |
-| Card Type                         | The card type for existing cards, which will be ignored when building cards                                                                                                  |
+| Note Type                         | The note type for existing cards, which will be ignored when building cards                                                                                                  |
 | Ignore File                       | Where to save the list of words to ignore                                                                                                                                    |
 | Output File                       | Where to save the CSV file of new cards, which can  then be imported into Anki                                                                                               |
 | Clear output file before starting | Clear the output file when you press start. You'll want this on if you have imported the cards from the previous session, and off if you're continuing the previous session. |

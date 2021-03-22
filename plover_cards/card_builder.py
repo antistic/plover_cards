@@ -89,7 +89,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.show()
 
     def setup_file_inputs(self):
-        self.anki_path.textChanged.connect(self.update_card_types)
+        self.anki_path.textChanged.connect(self.update_note_types)
 
         self.anki_path.setText(self.config["paths"]["anki_collection"])
         self.anki_browse.clicked.connect(
@@ -121,12 +121,12 @@ class CardBuilder(Tool, Ui_CardBuilder):
             )
         )
 
-    def update_card_types(self, anki_path):
-        self.card_type.clear()
+    def update_note_types(self, anki_path):
+        self.note_type.clear()
         for i, model in enumerate(get_models(anki_path)):
-            self.card_type.addItem(model.name, str(model.id))
-            if model.name == self.config["anki"]["card_type"]:
-                self.card_type.setCurrentIndex(i)
+            self.note_type.addItem(model.name, str(model.id))
+            if model.name == self.config["anki"]["note_type"]:
+                self.note_type.setCurrentIndex(i)
 
     def on_browse(self, label, title, location, extensions):
         def func():
@@ -173,7 +173,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
     def setup_cards(self):
         self.cards = Cards(
             self.anki_path.text(),
-            self.card_type.currentData(),
+            self.note_type.currentData(),
             self.ignore_path.text(),
             self.output_path.text(),
             self.card_suggestions,
@@ -193,7 +193,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
             "ignore": self.ignore_path.text(),
             "output": self.output_path.text(),
         }
-        self.config["anki"]["card_type"] = self.card_type.currentText()
+        self.config["anki"]["note_type"] = self.note_type.currentText()
         self.config["options"]["clear_output_on_start"] = str(
             self.clear_output.isChecked()
         )

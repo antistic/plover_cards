@@ -18,7 +18,7 @@ def read_config():
     if len(collections) > 0:
         config["paths"]["anki_collection"] = str(collections[0])
 
-    config["anki"] = {"card_type": "Basic"}
+    config["anki"] = {"note_type": "Basic"}
 
     config["options"] = {
         "clear_output_on_start": "False",

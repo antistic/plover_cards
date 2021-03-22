@@ -6,11 +6,11 @@ from pathlib import Path
 import re
 
 
-def get_existing_notes(anki_path, card_type):
+def get_existing_notes(anki_path, note_type):
     conn = sqlite3.connect(f"file:{anki_path}?mode=ro", uri=True)
     with conn:
         cursor = conn.cursor()
-        cursor.execute("select sfld from notes where mid=?;", [card_type])
+        cursor.execute("select sfld from notes where mid=?;", [note_type])
         results = cursor.fetchall()
 
     return set(map(lambda r: r[0], results))
@@ -117,7 +117,7 @@ class Cards:
     def __init__(
         self,
         anki_path,
-        card_type,
+        note_type,
         ignore_path,
         output_path,
         card_suggestions,
@@ -125,7 +125,7 @@ class Cards:
         self.ignore_path = Path(ignore_path)
         self.output_path = Path(output_path)
 
-        existing_notes = get_existing_notes(anki_path, card_type)
+        existing_notes = get_existing_notes(anki_path, note_type)
         self.ignored = get_ignored_from_file(self.ignore_path)
 
         new_notes = get_new_notes(self.output_path)
