@@ -180,13 +180,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.suggestions.clicked.connect(self.on_suggestion_click)
 
     def setup_cards(self):
-        self.cards = Cards(
-            self.anki_path.text(),
-            self.note_type.currentData(),
-            self.ignore_path.text(),
-            self.output_path.text(),
-            self.card_suggestions,
-        )
+        self.cards = Cards(self.config, self.card_suggestions)
         self.card_view_model = CardTableModel(self.card_view)
         self.card_view_model.set_cards_(self.cards)
         self.card_view.setModel(self.card_view_model)

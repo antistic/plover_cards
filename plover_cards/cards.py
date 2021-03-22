@@ -5,15 +5,21 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import re
 
+from .anki_utils import get_models
+
 
 def get_existing_notes(anki_path, note_type):
+    models = get_models(anki_path)
+    note_id = next((model.id for model in models if model.name == note_type))
+
     conn = sqlite3.connect(f"file:{anki_path}?mode=ro", uri=True)
     with conn:
         cursor = conn.cursor()
-        cursor.execute("select sfld from notes where mid=?;", [note_type])
-        results = cursor.fetchall()
 
-    return set(map(lambda r: r[0], results))
+        cursor.execute("select sfld from notes where mid=?;", [note_id])
+        notes = cursor.fetchall()
+
+    return set(map(lambda r: r[0], notes))
 
 
 def get_ignored_from_file(ignore_file):
@@ -114,18 +120,13 @@ def create_cards(card_suggestions, ignored, new_notes):
 
 
 class Cards:
-    def __init__(
-        self,
-        anki_path,
-        note_type,
-        ignore_path,
-        output_path,
-        card_suggestions,
-    ):
-        self.ignore_path = Path(ignore_path)
-        self.output_path = Path(output_path)
+    def __init__(self, config, card_suggestions):
+        self.ignore_path = Path(config["paths"]["ignore"])
+        self.output_path = Path(config["paths"]["output"])
 
-        existing_notes = get_existing_notes(anki_path, note_type)
+        existing_notes = get_existing_notes(
+            config["paths"]["anki_collection"], config["anki"]["note_type"]
+        )
         self.ignored = get_ignored_from_file(self.ignore_path)
 
         new_notes = get_new_notes(self.output_path)
