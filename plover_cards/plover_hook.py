@@ -36,7 +36,9 @@ class Main:
         # last few "phrases", e.g. "let's go", "'s go", "s go", "go"
         phrases = set(("".join(split_words[i:]) for i in range(len(split_words))))
         # last translation in case it isn't shown exactly, e.g. "{#Return}{^}", {^ing}
-        phrases.add(last_translations[-1].english)
+        last_translation = last_translations[-1].english
+        if last_translation is not None:
+            phrases.add(last_translation)
 
         for phrase in phrases:
             for suggestion in self.engine.get_suggestions(phrase):
