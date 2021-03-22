@@ -15,16 +15,21 @@ from .card_suggestions import CardSuggestions
 
 
 class CardTableModel(QtCore.QAbstractTableModel):
+    # pylint: disable=no-self-use
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.cards = None
+
     def set_cards_(self, cards):
         self.cards = cards
 
     def refresh_(self, card_index):
         self.dataChanged.emit(self.index(card_index, 0), self.index(card_index, 1))
 
-    def rowCount(self, _parent):
+    def rowCount(self, _parent):  # pylint: disable=invalid-name
         return len(self.cards)
 
-    def columnCount(self, _parent):
+    def columnCount(self, _parent):  # pylint: disable=invalid-name
         return 3
 
     def data(self, index, role):
@@ -42,7 +47,7 @@ class CardTableModel(QtCore.QAbstractTableModel):
             return ", ".join(card.similar_ignored)
         return "??"
 
-    def headerData(self, section, orientation, role):
+    def headerData(self, section, orientation, role):  # pylint: disable=invalid-name
         if role != QtCore.Qt.DisplayRole or orientation != QtCore.Qt.Horizontal:
             return QtCore.QVariant()
 
@@ -62,7 +67,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
     ROLE = "cardbuilder"
 
     def __init__(self, engine):
-        super(CardBuilder, self).__init__(engine)
+        super().__init__(engine)
         self.engine = engine
 
         hook = self.engine._running_extensions.get("plover_cards_hook")
@@ -83,6 +88,10 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.setup_file_inputs()
         self.setup_buttons()
         self.setup_suggestions()
+
+        self.current_card_index = 0
+        self.cards = None
+        self.card_view_model = None
 
         self.pages.setCurrentIndex(0)
         self.start.setFocus()
@@ -149,7 +158,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
                 self.start.setEnabled(False)
                 return
 
-            if all([input.text() != "" for input in text_inputs]):
+            if all((input.text() != "" for input in text_inputs)):
                 self.start.setEnabled(True)
             else:
                 self.start.setEnabled(False)
@@ -178,7 +187,6 @@ class CardBuilder(Tool, Ui_CardBuilder):
             self.output_path.text(),
             self.card_suggestions,
         )
-        self.current_card_index = 0
         self.card_view_model = CardTableModel(self.card_view)
         self.card_view_model.set_cards_(self.cards)
         self.card_view.setModel(self.card_view_model)
