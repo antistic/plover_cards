@@ -319,6 +319,11 @@ class CardBuilder(Tool, Ui_CardBuilder):
 
 
 if __name__ == "__main__":
+
+    class EngineMock:
+        def __init__(self):
+            self._running_extensions = {}
+
     app = QtWidgets.QApplication([])
-    dialog = CardBuilder({})
+    dialog = CardBuilder(EngineMock())
     app.exec_()
