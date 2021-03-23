@@ -1,0 +1,8 @@
+[build-system]
+requires = [
+    "plover>=4.0.0.dev3",
+    "PyQt5",
+    "setuptools>=42",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
