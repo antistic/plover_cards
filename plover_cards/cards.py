@@ -103,7 +103,7 @@ def create_cards(card_suggestions, ignored, new_notes):
     suggestions = card_suggestions.card_suggestions
 
     cards = []
-    for phrase, data in sorted(suggestions.items(), key=lambda x: x[0].lower()):
+    for phrase, data in suggestions.copy().items():
         if phrase in ignored:
             card_suggestions.delete(phrase)
         else:
@@ -163,6 +163,9 @@ class Cards:
         all_ignored = self.ignored.union(self.new_ignored)
         self.ignore_path.parent.mkdir(parents=True, exist_ok=True)
         self.ignore_path.write_text("\n".join(sorted(list(all_ignored))))
+
+    def sort(self, *args, **kwargs):
+        self.cards.sort(*args, **kwargs)
 
     def _as_notes(self):
         return "\n".join(

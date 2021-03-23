@@ -31,15 +31,19 @@ class CardTableModel(QtCore.QAbstractTableModel):
 
     def set_cards_(self, cards):
         self.cards = cards
+        self.sort(CardTableColumn.FREQUENCY, QtCore.Qt.DescendingOrder)
 
     def refresh_(self, card_index):
-        self.dataChanged.emit(self.index(card_index, 0), self.index(card_index, 1))
+        self.dataChanged.emit(
+            self.index(card_index, 0),
+            self.index(card_index, self.columnCount()),
+        )
 
-    def rowCount(self, _parent):  # pylint: disable=invalid-name
+    def rowCount(self, _parent=None):  # pylint: disable=invalid-name
         return len(self.cards)
 
-    def columnCount(self, _parent):  # pylint: disable=invalid-name
-        return 3
+    def columnCount(self, _parent=None):  # pylint: disable=invalid-name
+        return 4
 
     def data(self, index, role):
         if role != QtCore.Qt.DisplayRole:
@@ -71,6 +75,26 @@ class CardTableModel(QtCore.QAbstractTableModel):
         if section == CardTableColumn.IGNORED:
 
         return "??"
+
+    def sort(self, column, order=QtCore.Qt.AscendingOrder):
+        def key(card):
+            if column == CardTableColumn.FREQUENCY:
+                return card.frequency
+            if column == CardTableColumn.TRANSLATION:
+                return card.translation.lower()
+            if column == CardTableColumn.STROKES:
+                if card.chosen_strokes is not None:
+                    return card.chosen_strokes
+            if column == CardTableColumn.IGNORED:
+                if card.similar_ignored is not None:
+                    return card.similar_ignored
+            return ""
+
+        self.cards.sort(key=key, reverse=order == QtCore.Qt.DescendingOrder)
+        self.dataChanged.emit(
+            self.index(0, 0),
+            self.index(self.rowCount(), self.columnCount()),
+        )
 
 
 class CardBuilder(Tool, Ui_CardBuilder):
