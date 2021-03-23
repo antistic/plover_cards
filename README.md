@@ -34,6 +34,7 @@ These options are saved in `{your_plover_config_folder}/plover_cards.cfg`
 
 - *Stroke list*: Pick which stroke you want on the back of the Anki card here.
 - *Card list*:
+  - *Count*: The number of times you typed this word and/or the number of times it was suggested to you.
   - *Translation*: The word or phrase on the front of the Anki card.
   - *Stroke*: The stroke on the back of the Anki card.
   - *Similar ignored*: Similar words that are either already in the Anki deck or have been added to the ignore list.

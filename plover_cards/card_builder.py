@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from enum import IntEnum
+
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
@@ -12,6 +14,13 @@ from .cards import Cards
 from .config import read_config, save_config
 from .card_builder_ui import Ui_CardBuilder
 from .card_suggestions import CardSuggestions
+
+
+class CardTableColumn(IntEnum):
+    FREQUENCY = 0
+    TRANSLATION = 1
+    STROKES = 2
+    IGNORED = 3
 
 
 class CardTableModel(QtCore.QAbstractTableModel):
@@ -37,13 +46,15 @@ class CardTableModel(QtCore.QAbstractTableModel):
             return QtCore.QVariant()
         card = self.cards[index.row()]
 
-        if index.column() == 0:
+        if index.column() == CardTableColumn.FREQUENCY:
+            return card.frequency
+        if index.column() == CardTableColumn.TRANSLATION:
             return card.translation
-        if index.column() == 1:
+        if index.column() == CardTableColumn.STROKES:
             if card.ignored:
                 return "(ignored)"
             return card.chosen_strokes
-        if index.column() == 2:
+        if index.column() == CardTableColumn.IGNORED:
             return ", ".join(card.similar_ignored)
         return "??"
 
@@ -51,12 +62,13 @@ class CardTableModel(QtCore.QAbstractTableModel):
         if role != QtCore.Qt.DisplayRole or orientation != QtCore.Qt.Horizontal:
             return QtCore.QVariant()
 
-        if section == 0:
+        if section == CardTableColumn.FREQUENCY:
+            return "Count"
+        if section == CardTableColumn.TRANSLATION:
             return "Translation"
-        if section == 1:
+        if section == CardTableColumn.STROKES:
             return "Stroke"
-        if section == 2:
-            return "Similar Ignored"
+        if section == CardTableColumn.IGNORED:
 
         return "??"
 
