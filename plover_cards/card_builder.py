@@ -195,7 +195,10 @@ class CardBuilder(Tool, Ui_CardBuilder):
                 self.start.setEnabled(False)
                 return
 
-            if all((input.text() != "" for input in text_inputs)):
+            if (
+                all((input.text() != "" for input in text_inputs))
+                and self.note_type.currentText() != ""
+            ):
                 self.start.setEnabled(True)
             else:
                 self.start.setEnabled(False)
