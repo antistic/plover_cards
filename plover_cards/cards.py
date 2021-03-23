@@ -73,16 +73,18 @@ def strokes_sort_key(strokes):
 
 
 def similar_words(word):
+    # does the reverse of tucked in suffix keys
+    # https://github.com/openstenoproject/plover/blob/91a84e16403e9d7470d0192c3b5484e422060a0b/plover/system/english_stenotype.py#L32
+
     replacements = [
         ("s$", ""),
         ("es$", ""),
         ("ies$", "y"),
         ("ves$", "f"),
         ("ing$", ""),
-        (".ing$", ""),
+        (r"(.)\1ing$", r"\1"),
         ("ing$", "e"),
         ("ying$", "ie"),
-        ("d$", ""),
         ("ed$", ""),
         ("ied$", "y"),
         ("eed$", "ee"),
