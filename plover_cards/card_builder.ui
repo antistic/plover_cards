@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>865</width>
-    <height>587</height>
+    <width>900</width>
+    <height>575</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -152,7 +152,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page_2">
-      <layout class="QGridLayout" name="gridLayout">
+      <layout class="QGridLayout" name="gridLayout" columnstretch="1,2">
        <item row="1" column="0">
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
@@ -183,6 +183,9 @@
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
              </property>
             </widget>
            </item>

@@ -73,6 +73,7 @@ class CardTableModel(QtCore.QAbstractTableModel):
         if section == CardTableColumn.STROKES:
             return "Stroke"
         if section == CardTableColumn.IGNORED:
+            return "Similar\nIgnored"
 
         return "??"
 
@@ -221,7 +222,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.card_view_model.set_cards_(self.cards)
         self.card_view.setModel(self.card_view_model)
         self.card_view.horizontalHeader().setSectionResizeMode(
-            QtWidgets.QHeaderView.Stretch
+            QtWidgets.QHeaderView.Interactive
         )
         self.card_view.clicked.connect(self.on_card_click)
 
