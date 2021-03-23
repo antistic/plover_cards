@@ -1,6 +1,7 @@
 import re
 
 from plover.formatting import RetroFormatter
+from plover.translation import escape_translation
 
 from .card_suggestions import CardSuggestions
 
@@ -38,7 +39,7 @@ class Main:
         # last translation in case it isn't shown exactly, e.g. "{#Return}{^}", {^ing}
         last_translation = last_translations[-1].english
         if last_translation is not None:
-            phrases.add(last_translation)
+            phrases.add(escape_translation(last_translation))
 
         for phrase in phrases:
             for suggestion in self.engine.get_suggestions(phrase):
