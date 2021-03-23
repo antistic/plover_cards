@@ -72,7 +72,7 @@ def strokes_sort_key(strokes):
     return f"{num_strokes}{len(strokes)}{strokes}"
 
 
-def possible_roots(word):
+def similar_words(word):
     replacements = [
         ("s$", ""),
         ("es$", ""),
@@ -88,15 +88,15 @@ def possible_roots(word):
         ("eed$", "ee"),
     ]
 
-    roots = set()
+    words = set()
     for replacement in replacements:
-        (root, count) = re.subn(replacement[0], replacement[1], word)
+        (similar_word, count) = re.subn(replacement[0], replacement[1], word)
         if count > 0:
-            roots.add(root)
+            words.add(similar_word)
 
-    roots.add(word.lower())
+    words.add(word.lower())
 
-    return roots
+    return words
 
 
 def create_cards(card_suggestions, ignored, new_notes):
@@ -112,7 +112,7 @@ def create_cards(card_suggestions, ignored, new_notes):
                 stroke_suggestions=sorted(list(data["strokes"]), key=strokes_sort_key),
                 frequency=data["frequency"],
                 chosen_strokes=new_notes.get(phrase, None),
-                similar_ignored=list(possible_roots(phrase).intersection(ignored)),
+                similar_ignored=list(similar_words(phrase).intersection(ignored)),
             )
             cards.append(card)
 
