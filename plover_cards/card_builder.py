@@ -125,6 +125,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.setup_file_inputs()
         self.setup_buttons()
         self.setup_suggestions()
+        self.custom_strokes.textChanged.connect(self.on_custom_stroke)
 
         self.current_card_index = 0
         self.cards = None
@@ -288,6 +289,12 @@ class CardBuilder(Tool, Ui_CardBuilder):
             self.suggestions.setCurrentIndex(index)
             self.on_suggestion_click(index)
 
+        if (
+            card.chosen_strokes is not None
+            and self.suggestions.currentIndex().row() == -1
+        ):
+            self.custom_strokes.setText(card.chosen_strokes)
+
         self.suggestions.show()
 
     def on_prev_card(self):
@@ -299,16 +306,29 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.show_card()
 
     def on_clear_card(self):
-        self.suggestions.clearSelection()
         self.cards.choose_strokes(self.current_card_index, None)
+
+        self.suggestions.clearSelection()
+        self.custom_strokes.setText("")
         self.card_view_model.refresh_(self.current_card_index)
 
     def on_ignore_card(self):
         self.cards.ignore(self.current_card_index)
+
+        self.suggestions.clearSelection()
+        self.custom_strokes.setText("")
         self.card_view_model.refresh_(self.current_card_index)
 
     def on_suggestion_click(self, list_item):
         self.cards.choose_strokes(self.current_card_index, list_item.data())
+
+        self.custom_strokes.setText("")
+        self.card_view_model.refresh_(self.current_card_index)
+
+    def on_custom_stroke(self, new_text):
+        self.cards.choose_strokes(self.current_card_index, new_text)
+
+        self.suggestions.clearSelection()
         self.card_view_model.refresh_(self.current_card_index)
 
     def on_card_click(self, list_item):
