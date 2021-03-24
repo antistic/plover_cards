@@ -343,14 +343,18 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.show_card()
 
     def on_finish(self):
-        (num_notes, output_path) = self.cards.save()
+        (num_notes, num_ignored) = self.cards.save()
         save_config(self.config)
         self.close()
 
         save_msg = QtWidgets.QMessageBox(
             QtWidgets.QMessageBox.NoIcon,
             "Finished",
-            f"{num_notes} notes saved to {output_path}, ready for you to import into Anki",
+            (
+                f"{num_notes} note(s) saved to {self.config['paths']['output']}\n"
+                f"{num_ignored} word(s) added to the ignore file\n"
+                "\nYou can now import into Anki"
+            ),
             QtWidgets.QMessageBox.Ok,
         )
         save_msg.exec_()

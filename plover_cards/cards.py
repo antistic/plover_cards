@@ -169,7 +169,7 @@ class Cards:
         self.ignore_path.parent.mkdir(parents=True, exist_ok=True)
         self.ignore_path.write_text("\n".join(sorted(list(all_ignored))))
 
-        return (len(notes), self.output_path)
+        return (len(notes), len(self.new_ignored))
 
     def sort(self, *args, **kwargs):
         self.cards.sort(*args, **kwargs)
