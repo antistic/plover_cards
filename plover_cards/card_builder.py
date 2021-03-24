@@ -278,6 +278,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.translation.setText(card.translation)
 
         self.suggestions_model.clear()
+        self.custom_strokes.setText("")
         for suggestion in card.stroke_suggestions:
             item = QtGui.QStandardItem(suggestion)
             item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
@@ -297,8 +298,6 @@ class CardBuilder(Tool, Ui_CardBuilder):
             and self.suggestions.currentIndex().row() == -1
         ):
             self.custom_strokes.setText(card.chosen_strokes)
-        else:
-            self.custom_strokes.setText("")
 
         self.suggestions.show()
 
