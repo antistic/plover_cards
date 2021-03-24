@@ -1,4 +1,5 @@
 import re
+from threading import Timer
 
 from plover.formatting import RetroFormatter
 from plover.translation import escape_translation
@@ -16,6 +17,7 @@ class Main:
         self.engine = engine
 
         self.card_suggestions = CardSuggestions()
+        self._on_timer()
 
     def start(self):
         self.engine.hook_connect("translated", self._on_translated)
@@ -23,6 +25,13 @@ class Main:
     def stop(self):
         self.engine.hook_disconnect("translated", self._on_translated)
         self.card_suggestions.save()
+        self.timer.cancel()
+
+    def _on_timer(self):
+        self.card_suggestions.save()
+
+        self.timer = Timer(300, self._on_timer)
+        self.timer.start()
 
     def _on_translated(self, _old, new):
         if len(new) == 0:

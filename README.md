@@ -8,6 +8,8 @@ This plugin might not work perfectly, so you may want to double check the cards 
 
 This part of the plugin listens to what you write and records the suggestions (you don't need to have the suggestion window open). It'll keep a count of how many times you use a stroke so you can focus on only the words you use often (or least often). Unlike the suggestions window, it'll also record suggestions for command, prefix and suffix strokes if you use them.
 
+The data is stored in `{your_plover_config_folder}/plover_cards/card_suggestions.pickle`. This gets saved when you disable the extension, quit Plover and every 5 minutes.
+
 ### Using the hook
 
 - Enable the plugin
