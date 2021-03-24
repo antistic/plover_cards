@@ -4,7 +4,7 @@ A Plover plugin which helps you build an Anki deck from the words and phrases yo
 
 This plugin might not work perfectly, so you may want to double check the cards before you add them.
 
-## Plover hook
+## Plover Cards Hook
 
 This part of the plugin listens to what you write and records the suggestions (you don't need to have the suggestion window open). It'll keep a count of how many times you use a stroke so you can focus on only the words you use often (or least often). Unlike the suggestions window, it'll also record suggestions for command, prefix and suffix strokes if you use them.
 
