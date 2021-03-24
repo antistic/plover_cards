@@ -294,6 +294,8 @@ class CardBuilder(Tool, Ui_CardBuilder):
             and self.suggestions.currentIndex().row() == -1
         ):
             self.custom_strokes.setText(card.chosen_strokes)
+        else:
+            self.custom_strokes.setText("")
 
         self.suggestions.show()
 
@@ -326,7 +328,10 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.card_view_model.refresh_(self.current_card_index)
 
     def on_custom_stroke(self, new_text):
-        self.cards.choose_strokes(self.current_card_index, new_text)
+        if new_text != "":
+            self.cards.choose_strokes(self.current_card_index, new_text)
+        else:
+            self.cards.choose_strokes(self.current_card_index, None)
 
         self.suggestions.clearSelection()
         self.card_view_model.refresh_(self.current_card_index)
