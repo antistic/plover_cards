@@ -4,12 +4,18 @@ A Plover plugin which helps you build an Anki deck from the words and phrases yo
 
 This plugin might not work perfectly, so you may want to double check the cards before you add them.
 
-## Usage
+## Plover hook
 
-### Before you start
+This part of the plugin listens to what you write and records the suggestions (you don't need to have the suggestion window open). It'll keep a count of how many times you use a stroke so you can focus on only the words you use often (or least often). Unlike the suggestions window, it'll also record suggestions for command, prefix and suffix strokes if you use them.
+
+### Using the hook
 
 - Enable the plugin
   - Right click the Plover icon, "Configure", "Plugins" tab, check the box next to "plover_cards_hook", "Apply"
+
+## Card Builder
+
+### Before you start
 - Set up Anki
   - Make an Anki collection
   - Make a note type for your steno cards (it can be the default "Basic" type, but if you want to use Anki for anything else as well then you should make a new note type)
