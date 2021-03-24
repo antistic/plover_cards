@@ -241,6 +241,24 @@
            </attribute>
           </widget>
          </item>
+         <item>
+          <widget class="QLabel" name="num_ignored">
+           <property name="font">
+            <font>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>0 ignored</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="indent">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item row="2" column="0" colspan="2">

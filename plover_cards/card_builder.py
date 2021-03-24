@@ -222,6 +222,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
 
     def setup_cards(self):
         self.cards = Cards(self.config, self.card_suggestions)
+
         self.card_view_model = CardTableModel(self.card_view)
         self.card_view_model.set_cards_(self.cards)
         self.card_view.setModel(self.card_view_model)
@@ -229,6 +230,8 @@ class CardBuilder(Tool, Ui_CardBuilder):
             QtWidgets.QHeaderView.Interactive
         )
         self.card_view.clicked.connect(self.on_card_click)
+
+        self.num_ignored.setText(f"{self.cards.num_ignored} ignored")
 
     def on_start(self):
         self.config["paths"] = {

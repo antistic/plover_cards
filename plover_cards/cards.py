@@ -105,8 +105,10 @@ def create_cards(card_suggestions, ignored, new_notes):
     suggestions = card_suggestions.card_suggestions
 
     cards = []
+    num_ignored = 0
     for phrase, data in suggestions.copy().items():
         if phrase in ignored:
+            num_ignored += 1
             card_suggestions.delete(phrase)
         else:
             card = Card(
@@ -118,7 +120,7 @@ def create_cards(card_suggestions, ignored, new_notes):
             )
             cards.append(card)
 
-    return cards
+    return (cards, num_ignored)
 
 
 class Cards:
@@ -132,7 +134,7 @@ class Cards:
         self.ignored = get_ignored_from_file(self.ignore_path)
 
         new_notes = get_new_notes(self.output_path)
-        self.cards = create_cards(
+        (self.cards, self.num_ignored) = create_cards(
             card_suggestions,
             existing_notes.union(self.ignored),
             new_notes,
