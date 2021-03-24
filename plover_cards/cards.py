@@ -160,13 +160,16 @@ class Cards:
 
     def save(self):
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
+        notes = self._as_notes()
         with self.output_path.open("a") as f:
-            f.write(self._as_notes())
+            f.write(notes)
             f.write("\n")
 
         all_ignored = self.ignored.union(self.new_ignored)
         self.ignore_path.parent.mkdir(parents=True, exist_ok=True)
         self.ignore_path.write_text("\n".join(sorted(list(all_ignored))))
+
+        return (len(notes), self.output_path)
 
     def sort(self, *args, **kwargs):
         self.cards.sort(*args, **kwargs)

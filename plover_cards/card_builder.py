@@ -344,9 +344,17 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.show_card()
 
     def on_finish(self):
-        self.cards.save()
+        (num_notes, output_path) = self.cards.save()
         save_config(self.config)
         self.close()
+
+        save_msg = QtWidgets.QMessageBox(
+            QtWidgets.QMessageBox.NoIcon,
+            "Finished",
+            f"{num_notes} notes saved to {output_path}, ready for you to import into Anki",
+            QtWidgets.QMessageBox.Ok,
+        )
+        save_msg.exec_()
 
 
 if __name__ == "__main__":
