@@ -1,7 +1,6 @@
 [build-system]
 requires = [
-    "plover>=4.0.0.dev3",
-    "PyQt5",
+    "plover[gui_qt]>=4.0.0.dev3",
     "setuptools>=42",
     "wheel"
 ]
