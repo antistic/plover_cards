@@ -162,7 +162,7 @@ class Cards:
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
         notes = self._as_notes()
         with self.output_path.open("a") as f:
-            f.write(notes)
+            f.write("\n".join(notes))
             f.write("\n")
 
         all_ignored = self.ignored.union(self.new_ignored)
@@ -175,10 +175,8 @@ class Cards:
         self.cards.sort(*args, **kwargs)
 
     def _as_notes(self):
-        return "\n".join(
-            [
-                card.as_note()
-                for card in self.cards
-                if not card.ignored and card.chosen_strokes
-            ]
-        )
+        return [
+            card.as_note()
+            for card in self.cards
+            if not card.ignored and card.chosen_strokes
+        ]
