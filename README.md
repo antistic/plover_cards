@@ -20,13 +20,13 @@ This plugin might not work perfectly, so you may want to double check the cards 
 
 ### Set Options
 
-| Option                            | What it's used for                                                                                                                                                           |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Anki Collection                   | The Anki collection with existing cards, which will be ignored when building cards                                                                                           |
-| Note Type                         | The note type for existing cards, which will be ignored when building cards                                                                                                  |
-| Ignore File                       | Where to save the list of words to ignore                                                                                                                                    |
-| Output File                       | Where to save the CSV file of new cards, which can then be imported into Anki                                                                                                |
-| Clear output file before starting | Clear the output file when you press start. You'll want this on if you have imported the cards from the previous session, and off if you're continuing the previous session. |
+| Option                            | What it's used for                                                                                                                                                                                                  |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Anki Collection                   | The Anki collection with existing cards, which will be ignored when building cards. Defaults to the first `.anki2` file it can find in the [default Anki  path](https://apps.ankiweb.net/docs/manual20.html#files). |
+| Note Type                         | The note type for existing cards, which will be ignored when building cards. Defaults to "Basic".                                                                                                                   |
+| Ignore File                       | Where to save the list of words to ignore. Defaults to `{your_plover_config_folder}/plover_cards/ignore.txt`.                                                                                                       |
+| Output File                       | Where to save the CSV file of new cards, which can then be imported into Anki. Defaults to `{your_plover_config_folder}/plover_cards/new_notes.txt`.                                                                |
+| Clear output file before starting | Clear the output file when you press start. You'll want this on if you have imported the cards from the previous session, and off if you're continuing the previous session.                                        |
 
 These options are saved in `{your_plover_config_folder}/plover_cards.cfg`
 
