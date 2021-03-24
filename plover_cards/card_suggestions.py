@@ -15,11 +15,11 @@ def sync(func):
 
 class CardSuggestions:
     PATH = Path(PLOVER_CONFIG_DIR, "plover_cards", "card_suggestions.pickle")
+    lock = Lock()
 
     def __init__(self):
         self.load()
         self.changed = False
-        self.lock = Lock()
 
     @sync
     def load(self):
