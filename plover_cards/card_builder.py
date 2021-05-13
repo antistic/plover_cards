@@ -24,6 +24,37 @@ class CardTableColumn(IntEnum):
     IGNORED = 4
 
 
+COLUMNS = [
+    {
+        "name": "Count",
+        "value": lambda card: card.frequency,
+        "sort_key": lambda card: card.frequency,
+    },
+    {
+        "name": "Last Used",
+        "value": lambda card: QtCore.QDateTime.fromSecsSinceEpoch(card.last_updated)
+        if card.last_updated
+        else "",
+        "sort_key": lambda card: card.last_updated if card.last_updated else 0,
+    },
+    {
+        "name": "Translation",
+        "value": lambda card: card.translation,
+        "sort_key": lambda card: card.translation.lower(),
+    },
+    {
+        "name": "Strokes",
+        "value": lambda card: "(ignored)" if card.ignored else card.chosen_strokes,
+        "sort_key": lambda card: card.chosen_strokes if card.chosen_strokes else "",
+    },
+    {
+        "name": "Similar\nIgnored",
+        "value": lambda card: ", ".join(card.similar_ignored),
+        "sort_key": lambda card: card.similar_ignored if card.similar_ignored else [],
+    },
+]
+
+
 class CardTableModel(QtCore.QAbstractTableModel):
     # pylint: disable=no-self-use
     def __init__(self, parent=None):
@@ -32,7 +63,7 @@ class CardTableModel(QtCore.QAbstractTableModel):
 
     def set_cards_(self, cards):
         self.cards = cards
-        self.sort(CardTableColumn.FREQUENCY, QtCore.Qt.DescendingOrder)
+        self.sort(0, QtCore.Qt.DescendingOrder)
 
     def refresh_(self, card_index):
         self.dataChanged.emit(
@@ -44,64 +75,25 @@ class CardTableModel(QtCore.QAbstractTableModel):
         return len(self.cards)
 
     def columnCount(self, _parent=None):  # pylint: disable=invalid-name
-        return 5
+        return len(COLUMNS)
 
     def data(self, index, role):
         if role != QtCore.Qt.DisplayRole:
             return QtCore.QVariant()
         card = self.cards[index.row()]
 
-        if index.column() == CardTableColumn.FREQUENCY:
-            return card.frequency
-        if index.column() == CardTableColumn.LAST_UPDATED:
-            if card.last_updated:
-                return QtCore.QDateTime.fromSecsSinceEpoch(card.last_updated)
-            else:
-                return ""
-        if index.column() == CardTableColumn.TRANSLATION:
-            return card.translation
-        if index.column() == CardTableColumn.STROKES:
-            if card.ignored:
-                return "(ignored)"
-            return card.chosen_strokes
-        if index.column() == CardTableColumn.IGNORED:
-            return ", ".join(card.similar_ignored)
-        return "??"
+        return COLUMNS[index.column()]["value"](card)
 
-    def headerData(self, section, orientation, role):  # pylint: disable=invalid-name
+    def headerData(self, column, orientation, role):  # pylint: disable=invalid-name
         if role != QtCore.Qt.DisplayRole or orientation != QtCore.Qt.Horizontal:
             return QtCore.QVariant()
 
-        if section == CardTableColumn.FREQUENCY:
-            return "Count"
-        if section == CardTableColumn.LAST_UPDATED:
-            return "Last Used"
-        if section == CardTableColumn.TRANSLATION:
-            return "Translation"
-        if section == CardTableColumn.STROKES:
-            return "Stroke"
-        if section == CardTableColumn.IGNORED:
-            return "Similar\nIgnored"
-
-        return "??"
+        return COLUMNS[column]["name"]
 
     def sort(self, column, order=QtCore.Qt.AscendingOrder):
-        def key(card):
-            if column == CardTableColumn.FREQUENCY:
-                return card.frequency
-            if column == CardTableColumn.LAST_UPDATED:
-                return card.last_updated or 0
-            if column == CardTableColumn.TRANSLATION:
-                return card.translation.lower()
-            if column == CardTableColumn.STROKES:
-                if card.chosen_strokes is not None:
-                    return card.chosen_strokes
-            if column == CardTableColumn.IGNORED:
-                if card.similar_ignored is not None:
-                    return card.similar_ignored
-            return ""
-
-        self.cards.sort(key=key, reverse=order == QtCore.Qt.DescendingOrder)
+        self.cards.sort(
+            key=COLUMNS[column]["sort_key"], reverse=order == QtCore.Qt.DescendingOrder
+        )
         self.dataChanged.emit(
             self.index(0, 0),
             self.index(self.rowCount(), self.columnCount()),
