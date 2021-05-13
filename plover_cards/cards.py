@@ -19,7 +19,7 @@ def normalise_note(note):
     translation = note[1]
     for find, replace in NOTE_REPLACEMENTS:
         translation = translation.replace(find, replace)
-    return translation
+    return translation.strip()
 
 
 def get_existing_notes(anki_path, note_type):
