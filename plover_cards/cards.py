@@ -16,7 +16,7 @@ NOTE_REPLACEMENTS = [
 
 
 def normalise_note(note):
-    translation = note[1]
+    translation = note[0]
     for find, replace in NOTE_REPLACEMENTS:
         translation = translation.replace(find, replace)
     return translation.strip()
