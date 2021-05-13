@@ -8,6 +8,20 @@ import re
 from .anki_utils import get_models
 
 
+NOTE_REPLACEMENTS = [
+    ("&amp;", "&"),
+    ("&gt;", ">"),
+    ("&lt;", "<"),
+]
+
+
+def normalise_note(note):
+    translation = note[1]
+    for find, replace in NOTE_REPLACEMENTS:
+        translation = translation.replace(find, replace)
+    return translation
+
+
 def get_existing_notes(anki_path, note_type):
     models = get_models(anki_path)
     note_id = next((model.id for model in models if model.name == note_type))
@@ -19,7 +33,7 @@ def get_existing_notes(anki_path, note_type):
         cursor.execute("select sfld from notes where mid=?;", [note_id])
         notes = cursor.fetchall()
 
-    return set(map(lambda r: r[0], notes))
+    return set(map(normalise_note, notes))
 
 
 def get_ignored_from_file(ignore_file):
