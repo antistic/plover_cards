@@ -234,6 +234,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.num_ignored.setText(f"{self.cards.num_ignored} ignored")
 
     def on_start(self):
+        # update config
         self.config["paths"] = {
             "anki_collection": self.anki_path.text(),
             "ignore": self.ignore_path.text(),
@@ -245,9 +246,11 @@ class CardBuilder(Tool, Ui_CardBuilder):
         )
         save_config(self.config)
 
-        self.setup_cards()
-        if self.config["options"]["clear_output_on_start"]:
+        # clear output
+        if self.config["options"]["clear_output_on_start"] == "True":
             Path(self.output_path.text()).write_text("")
+
+        self.setup_cards()
 
         self.pages.setCurrentIndex(1)
         if len(self.cards) > 0:
