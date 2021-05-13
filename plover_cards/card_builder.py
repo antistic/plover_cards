@@ -18,9 +18,10 @@ from .card_suggestions import CardSuggestions
 
 class CardTableColumn(IntEnum):
     FREQUENCY = 0
-    TRANSLATION = 1
-    STROKES = 2
-    IGNORED = 3
+    LAST_UPDATED = 1
+    TRANSLATION = 2
+    STROKES = 3
+    IGNORED = 4
 
 
 class CardTableModel(QtCore.QAbstractTableModel):
@@ -43,7 +44,7 @@ class CardTableModel(QtCore.QAbstractTableModel):
         return len(self.cards)
 
     def columnCount(self, _parent=None):  # pylint: disable=invalid-name
-        return 4
+        return 5
 
     def data(self, index, role):
         if role != QtCore.Qt.DisplayRole:
@@ -52,6 +53,11 @@ class CardTableModel(QtCore.QAbstractTableModel):
 
         if index.column() == CardTableColumn.FREQUENCY:
             return card.frequency
+        if index.column() == CardTableColumn.LAST_UPDATED:
+            if card.last_updated:
+                return QtCore.QDateTime.fromSecsSinceEpoch(card.last_updated)
+            else:
+                return ""
         if index.column() == CardTableColumn.TRANSLATION:
             return card.translation
         if index.column() == CardTableColumn.STROKES:
@@ -68,6 +74,8 @@ class CardTableModel(QtCore.QAbstractTableModel):
 
         if section == CardTableColumn.FREQUENCY:
             return "Count"
+        if section == CardTableColumn.LAST_UPDATED:
+            return "Last Used"
         if section == CardTableColumn.TRANSLATION:
             return "Translation"
         if section == CardTableColumn.STROKES:
@@ -81,6 +89,8 @@ class CardTableModel(QtCore.QAbstractTableModel):
         def key(card):
             if column == CardTableColumn.FREQUENCY:
                 return card.frequency
+            if column == CardTableColumn.LAST_UPDATED:
+                return card.last_updated or 0
             if column == CardTableColumn.TRANSLATION:
                 return card.translation.lower()
             if column == CardTableColumn.STROKES:

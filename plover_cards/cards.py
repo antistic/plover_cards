@@ -61,6 +61,7 @@ class Card:
     translation: str
     stroke_suggestions: list[str]
     frequency: int
+    last_updated: int
     chosen_strokes: str = None
     ignored: bool = False
     similar_ignored: list[str] = field(default_factory=list)
@@ -129,6 +130,7 @@ def create_cards(card_suggestions, ignored, new_notes):
                 translation=phrase,
                 stroke_suggestions=sorted(list(data["strokes"]), key=strokes_sort_key),
                 frequency=data["frequency"],
+                last_updated=data.get("last_updated"),
                 chosen_strokes=new_notes.get(phrase, None),
                 similar_ignored=list(similar_words(phrase).intersection(ignored)),
             )

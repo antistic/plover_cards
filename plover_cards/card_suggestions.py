@@ -1,6 +1,7 @@
 from pathlib import Path
 import pickle
 from threading import Lock
+import time
 
 from plover.oslayer.config import CONFIG_DIR as PLOVER_CONFIG_DIR
 
@@ -46,10 +47,12 @@ class CardSuggestions:
         if self.card_suggestions.get(text) is None:
             self.card_suggestions[text] = {
                 "frequency": 0,
+                "last_updated": time.time(),
                 "strokes": set(),
             }
 
         self.card_suggestions[text]["frequency"] += 1
+        self.card_suggestions[text]["last_updated"] = time.time()
         self.card_suggestions[text]["strokes"].update(stroke_suggestions)
 
         self.changed = True
