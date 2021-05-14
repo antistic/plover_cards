@@ -45,12 +45,59 @@ class Main:
 
         # last few "phrases", e.g. "let's go", "'s go", "s go", "go"
         phrases = set(("".join(split_words[i:]) for i in range(len(split_words))))
+
         # last translation in case it isn't shown exactly, e.g. "{#Return}{^}", {^ing}
         if len(last_translations) > 0:
             last_translation = last_translations[-1].english
             if last_translation is not None:
                 phrases.add(escape_translation(last_translation))
 
+        # build up a dictionary of phrase -> stroke from translations
+        # these phrases are a subset of what's in phrases, since it's only the phrases
+        # you actually wrote
+        #   e.g. if you wrote "let's"
+        #     phrases: {"let's go", "'s go", "s go", "go"}
+        #     phrase_strokes: {"let's go": ["HRETS", "TKPWO"], "go": ["TKPWO"]}
+        phrase_strokes = {}
+        previous = ""
+        for i in range(min(100, len(last_translations))):
+            translations = last_translations[i:]
+            phrase = "".join(
+                RetroFormatter(translations).last_words(10, rx=self.WORD_RX)
+            )
+
+            if phrase == previous:
+                continue
+            previous = phrase
+
+            strokes = [
+                part
+                for translation in translations
+                for part in translation.rtfcre
+                if any(
+                    action.command is None and action.combo is None
+                    for action in translation.formatting
+                )
+            ]
+
+            phrase_strokes[phrase] = strokes
+
         for phrase in phrases:
+            strokes = phrase_strokes.get(phrase, "")
             for suggestion in self.engine.get_suggestions(phrase):
-                self.card_suggestions.add_suggestion(suggestion)
+                self.card_suggestions.add_suggestion(
+                    suggestion,
+                    # is shorter if
+                    any(
+                        # there are fewer overall strokes
+                        (len(s) < len(strokes))
+                        or (
+                            # there is one stroke which is at least 3 characters shorter
+                            # (3 so we don't register misstrokes, and misstrokes are
+                            # usually only a key or two off)
+                            len(s) == 0
+                            and len(s[0]) + 3 <= len(strokes[0])
+                        )
+                        for s in suggestion.steno_list
+                    ),
+                )

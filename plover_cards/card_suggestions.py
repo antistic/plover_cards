@@ -40,7 +40,7 @@ class CardSuggestions:
         self.changed = False
 
     @sync
-    def add_suggestion(self, suggestion):
+    def add_suggestion(self, suggestion, is_shorter=False):
         text = suggestion.text
         stroke_suggestions = ["/".join(s) for s in suggestion.steno_list]
 
@@ -49,11 +49,16 @@ class CardSuggestions:
                 "frequency": 0,
                 "last_updated": time.time(),
                 "strokes": set(),
+                "frequency_shorter": 0,
             }
 
         self.card_suggestions[text]["frequency"] += 1
         self.card_suggestions[text]["last_updated"] = time.time()
         self.card_suggestions[text]["strokes"].update(stroke_suggestions)
+        if is_shorter:
+            self.card_suggestions[text]["frequency_shorter"] = (
+                self.card_suggestions[text].get("frequency_shorter", 0) + 1
+            )
 
         self.changed = True
 

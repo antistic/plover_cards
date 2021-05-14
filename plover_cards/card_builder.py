@@ -31,6 +31,11 @@ COLUMNS = [
         "sort_key": lambda card: card.frequency,
     },
     {
+        "name": "Count\n(shorter)",
+        "value": lambda card: card.frequency_shorter,
+        "sort_key": lambda card: card.frequency_shorter,
+    },
+    {
         "name": "Last Used",
         "value": lambda card: QtCore.QDateTime.fromSecsSinceEpoch(card.last_updated)
         if card.last_updated
