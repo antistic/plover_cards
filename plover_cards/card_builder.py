@@ -1,7 +1,5 @@
 from pathlib import Path
 
-from enum import IntEnum
-
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
@@ -14,14 +12,6 @@ from .cards import Cards
 from .config import read_config, save_config
 from .card_builder_ui import Ui_CardBuilder
 from .card_suggestions import CardSuggestions
-
-
-class CardTableColumn(IntEnum):
-    FREQUENCY = 0
-    LAST_UPDATED = 1
-    TRANSLATION = 2
-    STROKES = 3
-    IGNORED = 4
 
 
 COLUMNS = [
