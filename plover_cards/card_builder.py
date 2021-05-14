@@ -223,12 +223,33 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.card_view_model = CardTableModel(self.card_view)
         self.card_view_model.set_cards_(self.cards)
         self.card_view.setModel(self.card_view_model)
-        self.card_view.horizontalHeader().setSectionResizeMode(
-            QtWidgets.QHeaderView.Interactive
-        )
+        header = self.card_view.horizontalHeader()
+        header.setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
+        header.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        header.customContextMenuRequested.connect(self.show_header_menu)
         self.card_view.clicked.connect(self.on_card_click)
 
         self.num_ignored.setText(f"{self.cards.num_ignored} ignored")
+
+    def show_header_menu(self, position):
+        menu = QtWidgets.QMenu()
+        header = self.card_view.horizontalHeader()
+        for i, column in enumerate(COLUMNS):
+            if column["name"] == "Translation" or column["name"] == "Strokes":
+                continue
+            action = menu.addAction(column["name"])
+            action.setCheckable(True)
+            action.setChecked(not header.isSectionHidden(i))
+
+            def on_toggle(checked, i=i):
+                if checked:
+                    header.showSection(i)
+                else:
+                    header.hideSection(i)
+
+            action.toggled.connect(on_toggle)
+
+        menu.exec_(self.card_view.mapToGlobal(position))
 
     def on_start(self):
         # update config
