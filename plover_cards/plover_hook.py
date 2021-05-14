@@ -6,6 +6,12 @@ from plover.translation import escape_translation
 
 from .card_suggestions import CardSuggestions
 
+MAX_PHRASE_PARTS = 10
+MAX_TRANSLATIONS = 50
+MISSTROKE_OFFSET = 3  # misstrokes are often only a key or two different
+
+SAVE_INTERVAL = 300
+
 
 class Main:
 
@@ -30,7 +36,7 @@ class Main:
     def _on_timer(self):
         self.card_suggestions.save()
 
-        self.timer = Timer(300, self._on_timer)
+        self.timer = Timer(SAVE_INTERVAL, self._on_timer)
         self.timer.start()
 
     def _on_translated(self, _old, new):
@@ -39,9 +45,11 @@ class Main:
             return
 
         with self.engine:
-            last_translations = self.engine.translator_state.translations
+            last_translations = self.engine.translator_state.translations[
+                -MAX_TRANSLATIONS:
+            ]
             retro_formatter = RetroFormatter(last_translations)
-            split_words = retro_formatter.last_words(10, rx=self.WORD_RX)
+            split_words = retro_formatter.last_words(MAX_PHRASE_PARTS, rx=self.WORD_RX)
 
         # last few "phrases", e.g. "let's go", "'s go", "s go", "go"
         phrases = set(("".join(split_words[i:]) for i in range(len(split_words))))
@@ -60,10 +68,12 @@ class Main:
         #     phrase_strokes: {"let's go": ["HRETS", "TKPWO"], "go": ["TKPWO"]}
         phrase_strokes = {}
         previous = ""
-        for i in range(min(100, len(last_translations))):
+        for i in range(len(last_translations)):
             translations = last_translations[i:]
             phrase = "".join(
-                RetroFormatter(translations).last_words(10, rx=self.WORD_RX)
+                RetroFormatter(translations).last_words(
+                    MAX_PHRASE_PARTS, rx=self.WORD_RX
+                )
             )
 
             if phrase == previous:
@@ -92,11 +102,10 @@ class Main:
                         # there are fewer overall strokes
                         (len(s) < len(strokes))
                         or (
-                            # there is one stroke which is at least 3 characters shorter
-                            # (3 so we don't register misstrokes, and misstrokes are
-                            # usually only a key or two off)
+                            # there is one stroke which is at least MISSTROKE_OFFSET
+                            # characters shorter
                             len(s) == 0
-                            and len(s[0]) + 3 <= len(strokes[0])
+                            and len(s[0]) + MISSTROKE_OFFSET <= len(strokes[0])
                         )
                         for s in suggestion.steno_list
                     ),
