@@ -63,7 +63,7 @@ class Main:
         # build up a dictionary of phrase -> stroke from translations
         # these phrases are a subset of what's in phrases, since it's only the phrases
         # you actually wrote
-        #   e.g. if you wrote "let's"
+        #   e.g. if you wrote "let's go"
         #     phrases: {"let's go", "'s go", "s go", "go"}
         #     phrase_strokes: {"let's go": ["HRETS", "TKPWO"], "go": ["TKPWO"]}
         phrase_strokes = {}
