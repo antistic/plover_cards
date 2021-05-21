@@ -6,16 +6,21 @@ from plover.translation import escape_translation
 
 from .card_suggestions import CardSuggestions
 
+# same as in suggestions dialog and plover_clippy
 MAX_PHRASE_PARTS = 10
+# it's unlikely you'll have more than 5 translations per word for 10 words
 MAX_TRANSLATIONS = 50
-MISSTROKE_OFFSET = 3  # misstrokes are often only a key or two different
+# misstrokes are often only a key or two different
+MISSTROKE_OFFSET = 3
 
+# 5 minutes
 SAVE_INTERVAL = 300
 
 
 class Main:
 
-    # from https://github.com/openstenoproject/plover/blob/91a84e16403e9d7470d0192c3b5484e422060a0b/plover/gui_qt/suggestions_dialog.py#L36
+    # from suggestions dialog
+    # https://github.com/openstenoproject/plover/blob/91a84e16403e9d7470d0192c3b5484e422060a0b/plover/gui_qt/suggestions_dialog.py#L36
     WORD_RX = re.compile(r"(?:\w+|[^\w\s]+)\s*")
 
     def __init__(self, engine):
