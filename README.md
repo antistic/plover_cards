@@ -46,6 +46,8 @@ These options are saved in `{your_plover_config_folder}/plover_cards.cfg`
 - *Card list*:
   - You can click on any of the following columns to sort by that column. Click again to change the sort order.
   - *Count*: The number of times you typed this word and/or the number of times it was suggested to you.
+  - *Count (shorter)*: The number of times the program found a shorter suggestion for what you typed
+  - *Last Used*: The date and time you last used this word.
   - *Translation*: The word or phrase on the front of the Anki card.
   - *Stroke*: The stroke on the back of the Anki card.
   - *Similar ignored*: Similar words that are either already in the Anki deck or have been added to the ignore list.
