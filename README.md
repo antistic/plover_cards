@@ -2,9 +2,15 @@
 
 A Plover plugin which helps you build an Anki deck from the words and phrases you have typed.
 
-This plugin might not work perfectly, so you may want to double check the cards before you add them.
 
 ![screenshot of card builder window](https://user-images.githubusercontent.com/3298461/112348383-afbd6800-8cbf-11eb-8de7-8b6d48fe85f6.png)
+
+## Setup
+
+- Enable "plover_cards_hook"
+  - Right click the Plover icon, "Configure", "Plugins" tab, check the box next to "plover_cards_hook", "Apply"
+- Install [Anki](https://apps.ankiweb.net/)
+- Make sure all your steno cards are under the same [note type](https://docs.ankiweb.net/getting-started.html?highlight=note%20type#note-types), and you don't have any non-steno cards under that note type
 
 ## Plover Cards Hook
 
@@ -12,21 +18,15 @@ This part of the plugin listens to what you write and records the suggestions (y
 
 The data is stored in `{your_plover_config_folder}/plover_cards/card_suggestions.pickle`. This gets saved when you disable the extension, quit Plover and every 5 minutes.
 
-### Using the hook
-
-- Enable the plugin
-  - Right click the Plover icon, "Configure", "Plugins" tab, check the box next to "plover_cards_hook", "Apply"
-
 ## Card Builder
 
-### Before you start
-- Set up Anki
-  - Make an Anki collection
-  - Make a note type for your steno cards (it can be the default "Basic" type, but if you want to use Anki for anything else as well then you should make a new note type)
-- Use Plover and type some words that aren't in Anki
-- Start the card builder
-  - Make sure Anki isn't already running
-  - Right click the Plover icon, "Tools", "Card Builder"
+This is where you can look at the suggestions and choose which ones to export as a csv. It'll ignore any suggestions for words/phrases you already have in Anki, or previously added to the ignore file.
+
+### Usage
+
+- Make sure Anki isn't already running
+- (from the menu) Right click the Plover icon, "Tools", "Card Builder"
+- (from the gui) Click "Card Builder" icon in the top bar of the main Plover window.
 
 ### Set Options
 
