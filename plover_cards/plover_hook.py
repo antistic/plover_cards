@@ -54,12 +54,14 @@ class Main:
                 -MAX_TRANSLATIONS:
             ]
 
+        if len(last_translations) == 0:
+            return
+
         phrases = set()
         # last translation in case it isn't shown exactly, e.g. "{#Return}{^}", {^ing}
-        if len(last_translations) > 0:
-            last_translation = last_translations[-1].english
-            if last_translation is not None:
-                phrases.add(escape_translation(last_translation))
+        last_translation = last_translations[-1].english
+        if last_translation is not None:
+            phrases.add(escape_translation(last_translation))
 
         last_translations = [
             translation
