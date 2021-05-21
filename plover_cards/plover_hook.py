@@ -48,17 +48,29 @@ class Main:
             last_translations = self.engine.translator_state.translations[
                 -MAX_TRANSLATIONS:
             ]
-            retro_formatter = RetroFormatter(last_translations)
-            split_words = retro_formatter.last_words(MAX_PHRASE_PARTS, rx=self.WORD_RX)
 
-        # last few "phrases", e.g. "let's go", "'s go", "s go", "go"
-        phrases = set(("".join(split_words[i:]) for i in range(len(split_words))))
-
+        phrases = set()
         # last translation in case it isn't shown exactly, e.g. "{#Return}{^}", {^ing}
         if len(last_translations) > 0:
             last_translation = last_translations[-1].english
             if last_translation is not None:
                 phrases.add(escape_translation(last_translation))
+
+        last_translations = [
+            translation
+            for translation in last_translations
+            # strip out any command/combo translations since they don't make sense as
+            # part of phrases
+            if any(
+                action.command is None and action.combo is None
+                for action in translation.formatting
+            )
+        ]
+        retro_formatter = RetroFormatter(last_translations)
+        split_words = retro_formatter.last_words(MAX_PHRASE_PARTS, rx=self.WORD_RX)
+
+        # last few "phrases", e.g. "let's go", "'s go", "s go", "go"
+        phrases.update(set("".join(split_words[i:]) for i in range(len(split_words))))
 
         # build up a dictionary of phrase -> stroke from translations
         # these phrases are a subset of what's in phrases, since it's only the phrases
@@ -81,13 +93,7 @@ class Main:
             previous = phrase
 
             strokes = [
-                part
-                for translation in translations
-                for part in translation.rtfcre
-                if any(
-                    action.command is None and action.combo is None
-                    for action in translation.formatting
-                )
+                part for translation in translations for part in translation.rtfcre
             ]
 
             phrase_strokes[phrase] = strokes
