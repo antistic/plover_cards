@@ -84,7 +84,7 @@ class Main:
         # you actually wrote
         #   e.g. if you wrote "let's go"
         #     phrases: {"let's go", "'s go", "s go", "go"}
-        #     phrase_strokes: {"let's go": ["HRETS", "TKPWO"], "go": ["TKPWO"]}
+        #     phrase_strokes: {"let's go": ("HRETS", "TKPWO"), "go": ("TKPWO",)}
         phrase_strokes = {}
         previous = ""
         for i in range(len(last_translations)):
@@ -99,9 +99,9 @@ class Main:
                 continue
             previous = phrase
 
-            strokes = [
+            strokes = tuple(
                 part for translation in translations for part in translation.rtfcre
-            ]
+            )
 
             phrase_strokes[phrase] = strokes
 
