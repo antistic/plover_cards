@@ -3,7 +3,7 @@
 A Plover plugin which helps you build an Anki deck from the words and phrases you have typed.
 
 
-![screenshot of card builder window](https://user-images.githubusercontent.com/3298461/112348383-afbd6800-8cbf-11eb-8de7-8b6d48fe85f6.png)
+![screenshot of card builder window](https://user-images.githubusercontent.com/3298461/119559105-264b1480-bd9a-11eb-8509-c2e97e1bafbc.png)
 
 ## Setup
 
