@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import re
 
-from .anki_utils import get_models
+from plover_cards.anki_utils import get_models
 
 
 NOTE_REPLACEMENTS = [

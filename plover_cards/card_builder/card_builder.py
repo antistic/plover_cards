@@ -7,11 +7,12 @@ from PyQt5 import QtGui
 from plover.oslayer.config import CONFIG_DIR as PLOVER_CONFIG_DIR
 from plover.gui_qt.tool import Tool
 
-from .anki_utils import ANKI_BASE_DIR, get_models
+from plover_cards.anki_utils import ANKI_BASE_DIR, get_models
+from plover_cards.config import read_config, save_config
+from plover_cards.plover_hook.card_suggestions import CardSuggestions
+
 from .cards import Cards
-from .config import read_config, save_config
 from .card_builder_ui import Ui_CardBuilder
-from .card_suggestions import CardSuggestions
 
 
 COLUMNS = [
