@@ -28,7 +28,9 @@ COLUMNS = [
     },
     {
         "name": "Last Used",
-        "value": lambda card: QtCore.QDateTime.fromSecsSinceEpoch(card.last_updated)
+        "value": lambda card: QtCore.QDateTime.fromSecsSinceEpoch(
+            int(card.last_updated)
+        )
         if card.last_updated
         else "",
         "sort_key": lambda card: card.last_updated if card.last_updated else 0,
