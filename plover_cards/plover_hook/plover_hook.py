@@ -107,7 +107,9 @@ class Main:
 
         for phrase in phrases:
             strokes = phrase_strokes.get(phrase, "")
-            for suggestion in self.engine.get_suggestions(phrase):
+            with self.engine:
+                suggestions = self.engine.get_suggestions(phrase)
+            for suggestion in suggestions:
                 self.card_suggestions.add_suggestion(
                     suggestion,
                     # is shorter if
