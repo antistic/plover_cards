@@ -1,7 +1,6 @@
 # plover_cards
 
-A Plover plugin which helps you build an Anki deck from the words and phrases you have typed.
-
+A Plover plugin which helps you make cards for flashcard programs like Anki.
 
 ![screenshot of card builder window](https://user-images.githubusercontent.com/3298461/119559105-264b1480-bd9a-11eb-8509-c2e97e1bafbc.png)
 
@@ -9,8 +8,10 @@ A Plover plugin which helps you build an Anki deck from the words and phrases yo
 
 - Enable "plover_cards_hook"
   - Right click the Plover icon, "Configure", "Plugins" tab, check the box next to "plover_cards_hook", "Apply"
-- Install [Anki](https://apps.ankiweb.net/)
-- Make sure all your steno cards are under the same [note type](https://docs.ankiweb.net/getting-started.html?highlight=note%20type#note-types), and you don't have any non-steno cards under that note type
+
+### For Anki integration:
+
+- Install the [AnkiConnect](https://ankiweb.net/shared/info/2055492159) plugin for [Anki](https://apps.ankiweb.net/). You may need to restart Anki for the plugin to take effect
 
 ## Plover Cards Hook
 
@@ -20,44 +21,63 @@ The data is stored in `{your_plover_config_folder}/plover_cards/card_suggestions
 
 ## Card Builder
 
-This is where you can look at the suggestions and choose which ones to export as a csv. It'll ignore any suggestions for words/phrases you already have in Anki, or previously added to the ignore file.
+This is where you can look at the suggestions and choose which ones to make into flashcards.
 
 ### Usage
 
-- Make sure Anki isn't already running
+#### Anki Integration
+
+- Make sure Anki is running in the background
+
+#### Opening
+
 - (from the menu) Right click the Plover icon, "Tools", "Card Builder"
-- (from the gui) Click "Card Builder" icon in the top bar of the main Plover window.
+- (from the gui) Click "Card Builder" icon in the top bar of the main Plover window
 
-### Set Options
+### Settings
 
-| Option                            | What it's used for                                                                                                                                                                                                  |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Anki Collection                   | The Anki collection with existing cards, which will be ignored when building cards. Defaults to the first `.anki2` file it can find in the [default Anki  path](https://apps.ankiweb.net/docs/manual20.html#files). |
-| Note Type                         | The note type for existing cards, which will be ignored when building cards. Defaults to "Basic".                                                                                                                   |
-| Ignore File                       | Where to save the list of words to ignore. Defaults to `{your_plover_config_folder}/plover_cards/ignore.txt`.                                                                                                       |
-| Output File                       | Where to save the CSV file of new cards, which can then be imported into Anki. Defaults to `{your_plover_config_folder}/plover_cards/new_notes.txt`.                                                                |
-| Clear output file before starting | Clear the output file when you press start. You'll want this on if you have imported the cards from the previous session, and off if you're continuing the previous session.                                        |
+| Option            | What it's used for                                                                                                      |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Use Ignore File   | Whether to keep a file for words to ignore                                                                              |
+| Ignore File       | Path to the ignore file, which is a text file with each word/phrase to ignore on a new line                             |
+| Compare to Anki   | Whether to find words/phrases to ignore from existing Anki cards                                                        |
+| Query             | Which cards to look at, for example `deck:Plover` and `note:Steno`. The syntax is [the same as in the Anki browser][1]. |
+| Compare Field     | Which field in the card to look at, for example "Translation" or "Front"                                                |
+| Output to CSV     | Whether to output to CSV, which can be imported into Anki or other programs like Excel                                  |
+| Output File       | Path to the output file, which is a CSV of `Translation,Strokes`                                                        |
+| Write Method      | Whether to append or overwrite the output file                                                                          |
+| Add to Anki       | Whether to add cards to Anki at the end                                                                                 |
+| Deck              | Which deck to add to                                                                                                    |
+| Note Type         | What type of note to add                                                                                                |
+| Translation Field | Which field to put the translation in                                                                                   |
+| Strokes Field     | Which field to put the strokes in                                                                                       |
+| Tags              | Space separated list of tags to add to the new cards                                                                    |
 
-These options are saved in `{your_plover_config_folder}/plover_cards.cfg`
+[1]: https://docs.ankiweb.net/searching.html
+
+These options are saved in `{your_plover_config_folder}/plover_cards.cfg`.
 
 ### Build Cards
 
-- *Stroke list*: Pick which stroke you want on the back of the Anki card here.
-- *Card list*:
-  - You can click on any of the following columns to sort by that column. Click again to change the sort order.
-  - *Count*: The number of times you typed this word and/or the number of times it was suggested to you.
-  - *Count (shorter)*: The number of times the program found a shorter suggestion for what you typed
-  - *Last Used*: The date and time you last used this word.
-  - *Translation*: The word or phrase on the front of the Anki card.
-  - *Stroke*: The stroke on the back of the Anki card.
-  - *Similar ignored*: Similar words that are either already in the Anki deck or have been added to the ignore list.
-- *Buttons*:
-  - **Clear**: Clear the chosen stroke. Useful if you want to skip this card, since by default it will choose the first stroke in the list.
-  - **Ignore**: Add this word/phrase to the ignore list. It won't appear next time you use the card builder.
-  - **<**: Go to previous card.
-  - **>**: Go to next card.
-  - **Finish**: Finish building cards.
+#### Card list
+You can click on any of the following columns to sort by that column. Click again to change the sort order.
 
-### Add to Anki
+You can hide columns by right clicking the header and selecting/deselecting columns.
 
-In Anki go to `File` then `Import`. Select the output file you chose at the beginning (defaults to `{your_plover_config_folder}/plover_cards/new_notes.txt`).
+You can change the column size by dragging the edges of the column title.
+
+  - **Count**: The number of times you typed this word and/or the number of times it was suggested to you
+  - **Count (shorter)**: The number of times the program found a shorter suggestion for what you typed
+  - **Last Used**: The date and time you last used this word
+  - **Translation**: The word or phrase on the front of the Anki card
+  - **Stroke**: The stroke on the back of the Anki card
+  - **Similar ignored**: Similar words that are either already in the Anki deck or have been added to the ignore list
+
+#### Stroke list
+ Pick which stroke you want on the back of the Anki card here. Alternatively, write your stroke in the box underneath to use something else.
+#### Buttons
+  - **Clear**: Clear the chosen stroke. Useful if you want to skip this card, since by default it will choose the first stroke in the list
+  - **Ignore**: Add this word/phrase to the ignore list. It won't appear next time you use the card builder. This button is unavailable if "Use Ignore File" is not selected
+  - **<**: Go to previous card
+  - **>**: Go to next card
+  - **Finish**: Finish building cards. Depending on your settings, it will output to CSV and/or add cards to anki

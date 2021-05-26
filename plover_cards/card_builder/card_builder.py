@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
@@ -7,8 +5,8 @@ from PyQt5 import QtGui
 from plover.oslayer.config import CONFIG_DIR as PLOVER_CONFIG_DIR
 from plover.gui_qt.tool import Tool
 
-from plover_cards.anki_utils import ANKI_BASE_DIR, get_models
-from plover_cards.config import read_config, save_config
+from plover_cards import anki_utils
+from plover_cards import config
 from plover_cards.plover_hook.card_suggestions import CardSuggestions
 
 from .cards import Cards
@@ -98,6 +96,60 @@ class CardTableModel(QtCore.QAbstractTableModel):
         )
 
 
+def setup_checkbox_section(checkbox, section):
+    def action():
+        if checkbox.isChecked():
+            for item in section:
+                item.setEnabled(True)
+        else:
+            for item in section:
+                item.setEnabled(False)
+
+    action()
+    checkbox.stateChanged.connect(action)
+
+
+def setup_browse(parent, button, line_edit, title, location, extensions):
+    def action():
+        filename = QtWidgets.QFileDialog.getOpenFileName(
+            parent, title, location, f"{extensions};;All Files (*)"
+        )[0]
+        line_edit.setText(filename)
+
+    button.clicked.connect(action)
+
+
+def on_checkbox(checkbox, on_checked, on_unchecked):
+    def action():
+        if checkbox.isChecked():
+            on_checked()
+        else:
+            on_unchecked()
+
+    action()
+    checkbox.stateChanged.connect(action)
+
+
+def on_combobox(combobox, on_new_text, on_clear):
+    def action(new_text):
+        if new_text == "":
+            on_clear()
+        else:
+            on_new_text(new_text)
+
+    action(combobox.currentText())
+    combobox.currentTextChanged.connect(action)
+
+
+def combobox_set_items(combobox, new_items, default):
+    combobox.clear()
+    combobox.insertItems(0, new_items)
+
+    index = combobox.findText(default)
+    if index > -1:
+        combobox.setCurrentIndex(index)
+
+
 class CardBuilder(Tool, Ui_CardBuilder):
     TITLE = "Card Builder"
     ICON = ":/plover_cards/cards.svg"
@@ -116,13 +168,9 @@ class CardBuilder(Tool, Ui_CardBuilder):
 
         self.setupUi(self)
 
-        self.config = read_config()
+        self.config = config.read()
 
-        self.setup_disable_start_if_invalid()
-        self.clear_output.setChecked(
-            self.config["options"]["clear_output_on_start"] == "True"
-        )
-        self.setup_file_inputs()
+        self.setup_settings()
         self.setup_buttons()
         self.setup_suggestions()
         self.custom_strokes.textChanged.connect(self.on_custom_stroke)
@@ -135,77 +183,184 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.start.setFocus()
         self.show()
 
-    def setup_file_inputs(self):
-        self.anki_path.textChanged.connect(self.update_note_types)
+    def config_connect(self, widget, section, option, radio_value=None):
+        if isinstance(widget, QtWidgets.QLineEdit):
+            widget.setText(self.config.get(section, option))
 
-        self.anki_path.setText(self.config["paths"]["anki_collection"])
-        self.anki_browse.clicked.connect(
-            self.on_browse(
-                self.anki_path,
-                "Open Anki collection",
-                ANKI_BASE_DIR,
-                "Anki Collections (*.anki2)",
-            )
-        )
+            def update_config(new_text):
+                self.config[section][option] = new_text
 
-        self.ignore_path.setText(self.config["paths"]["ignore"])
-        self.ignore_browse.clicked.connect(
-            self.on_browse(
-                self.ignore_path,
-                "Open ignore file",
-                PLOVER_CONFIG_DIR,
-                "Text Files (*.txt)",
-            )
-        )
+            widget.textChanged.connect(update_config)
+        elif isinstance(widget, QtWidgets.QCheckBox):
+            widget.setChecked(self.config.getboolean(section, option))
 
-        self.output_path.setText(self.config["paths"]["output"])
-        self.output_browse.clicked.connect(
-            self.on_browse(
-                self.output_path,
-                "Open output file",
-                PLOVER_CONFIG_DIR,
-                "Text Files (*.txt)",
-            )
-        )
+            def update_config():
+                if widget.isChecked():
+                    self.config[section][option] = "yes"
+                else:
+                    self.config[section][option] = "no"
 
-    def update_note_types(self, anki_path):
-        self.note_type.clear()
-        for i, model in enumerate(get_models(anki_path)):
-            self.note_type.addItem(model.name, str(model.id))
-            if model.name == self.config["anki"]["note_type"]:
-                self.note_type.setCurrentIndex(i)
+            widget.stateChanged.connect(update_config)
+        elif isinstance(widget, QtWidgets.QComboBox):
+            widget.setCurrentText(self.config.get(section, option))
 
-    def on_browse(self, label, title, location, extensions):
-        def func():
-            filename = QtWidgets.QFileDialog.getOpenFileName(
-                self, title, location, f"{extensions};;All Files (*)"
-            )[0]
-            label.setText(filename)
+            def update_config(new_text):
+                if new_text != "":
+                    self.config[section][option] = new_text
 
-        return func
-
-    def setup_disable_start_if_invalid(self):
-        text_inputs = [
-            self.anki_path,
-            self.ignore_path,
-            self.output_path,
-        ]
-
-        def on_text_changed(new_text):
-            if new_text == "":
-                self.start.setEnabled(False)
-                return
-
-            if (
-                all((input.text() != "" for input in text_inputs))
-                and self.note_type.currentText() != ""
-            ):
-                self.start.setEnabled(True)
+            widget.currentTextChanged.connect(update_config)
+        elif isinstance(widget, QtWidgets.QRadioButton):
+            if self.config.get(section, option) == radio_value:
+                widget.setChecked(True)
             else:
-                self.start.setEnabled(False)
+                widget.setChecked(False)
 
-        for text_input in text_inputs:
-            text_input.textChanged.connect(on_text_changed)
+            def update_config():
+                if widget.isChecked():
+                    self.config[section][option] = radio_value
+
+            widget.toggled.connect(update_config)
+        else:
+            raise Exception(f"unknown widget type for {widget}")
+
+    def setup_settings(self):
+        # connect to config
+        self.config_connect(self.use_ignore, "compare_ignore", "enabled")
+        self.config_connect(self.ignore_path, "compare_ignore", "file_path")
+
+        self.config_connect(self.compare_to_anki, "compare_to_anki", "enabled")
+        self.config_connect(self.anki_query, "compare_to_anki", "query")
+        self.config_connect(self.anki_compare_field, "compare_to_anki", "compare_field")
+
+        self.config_connect(self.output_to_csv, "output_csv", "enabled")
+        self.config_connect(self.output_path, "output_csv", "file_path")
+        self.config_connect(
+            self.overwrite_output, "output_csv", "write_method", "Overwrite"
+        )
+        self.config_connect(self.append_output, "output_csv", "write_method", "Append")
+
+        self.config_connect(self.add_to_anki, "add_to_anki", "enabled")
+        self.config_connect(self.deck, "add_to_anki", "deck")
+        self.config_connect(self.note_type, "add_to_anki", "note_type")
+        self.config_connect(self.translation_field, "add_to_anki", "translation_field")
+        self.config_connect(self.strokes_field, "add_to_anki", "strokes_field")
+        self.config_connect(self.tags, "add_to_anki", "tags")
+
+        # set up sections
+        setup_checkbox_section(
+            self.use_ignore, [self.ignore_label, self.ignore_path, self.ignore_browse]
+        )
+        setup_checkbox_section(
+            self.compare_to_anki,
+            [
+                self.anki_query_label,
+                self.anki_query,
+                self.anki_compare_field_label,
+                self.anki_compare_field,
+            ],
+        )
+        setup_checkbox_section(
+            self.output_to_csv,
+            [
+                self.output_label,
+                self.output_path,
+                self.output_browse,
+                self.write_method_label,
+                self.overwrite_output,
+                self.append_output,
+            ],
+        )
+        setup_checkbox_section(
+            self.add_to_anki,
+            [
+                self.deck_label,
+                self.deck,
+                self.note_type_label,
+                self.note_type,
+                self.translation_field_label,
+                self.translation_field,
+                self.strokes_field_label,
+                self.strokes_field,
+                self.tags_label,
+                self.tags,
+            ],
+        )
+
+        # set up browse
+        setup_browse(
+            self,
+            self.ignore_browse,
+            self.ignore_path,
+            "Open ignore file",
+            PLOVER_CONFIG_DIR,
+            "Text Files (*.txt)",
+        )
+        setup_browse(
+            self,
+            self.output_browse,
+            self.output_path,
+            "Open output file",
+            PLOVER_CONFIG_DIR,
+            "Text Files (*.txt);;CSV Files (*.csv)",
+        )
+
+        # request anki_connect permission
+        try:
+            result = anki_utils.invoke("requestPermission")
+            if result["permission"] != "granted":
+                raise Exception("Anki connect permisson denied")
+        except Exception:
+            self.compare_to_anki.setChecked(False)
+            self.compare_to_anki.setEnabled(False)
+            self.add_to_anki.setChecked(False)
+            self.add_to_anki.setEnabled(False)
+
+        # set up comboboxes
+        on_checkbox(
+            self.compare_to_anki,
+            lambda: combobox_set_items(
+                self.anki_compare_field,
+                anki_utils.all_field_names(),
+                self.config["compare_to_anki"]["compare_field"],
+            ),
+            self.deck.clear,
+        )
+        on_checkbox(
+            self.add_to_anki,
+            lambda: combobox_set_items(
+                self.deck,
+                anki_utils.invoke("deckNames"),
+                self.config["add_to_anki"]["deck"],
+            ),
+            self.deck.clear,
+        )
+        on_checkbox(
+            self.add_to_anki,
+            lambda: combobox_set_items(
+                self.note_type,
+                anki_utils.invoke("modelNames"),
+                self.config["add_to_anki"]["note_type"],
+            ),
+            self.note_type.clear,
+        )
+        on_combobox(
+            self.note_type,
+            lambda new_text: combobox_set_items(
+                self.translation_field,
+                anki_utils.invoke("modelFieldNames", modelName=new_text),
+                self.config["add_to_anki"]["translation_field"],
+            ),
+            self.translation_field.clear,
+        )
+        on_combobox(
+            self.note_type,
+            lambda new_text: combobox_set_items(
+                self.strokes_field,
+                anki_utils.invoke("modelFieldNames", modelName=new_text),
+                self.config["add_to_anki"]["strokes_field"],
+            ),
+            self.strokes_field.clear,
+        )
 
     def setup_buttons(self):
         self.start.clicked.connect(self.on_start)
@@ -234,6 +389,17 @@ class CardBuilder(Tool, Ui_CardBuilder):
 
         self.num_ignored.setText(f"{self.cards.num_ignored} ignored")
 
+        if not self.config.getboolean("compare_ignore", "enabled"):
+            self.ignore_card.hide()
+
+            if not self.config.getboolean("compare_to_anki", "enabled"):
+                index = next(
+                    i
+                    for i, col in enumerate(COLUMNS)
+                    if col["name"] == "Similar\nIgnored"
+                )
+                header.hideSection(index)
+
     def show_header_menu(self, position):
         menu = QtWidgets.QMenu()
         header = self.card_view.horizontalHeader()
@@ -255,21 +421,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
         menu.exec_(self.card_view.mapToGlobal(position))
 
     def on_start(self):
-        # update config
-        self.config["paths"] = {
-            "anki_collection": self.anki_path.text(),
-            "ignore": self.ignore_path.text(),
-            "output": self.output_path.text(),
-        }
-        self.config["anki"]["note_type"] = self.note_type.currentText()
-        self.config["options"]["clear_output_on_start"] = str(
-            self.clear_output.isChecked()
-        )
-        save_config(self.config)
-
-        # clear output
-        if self.config["options"]["clear_output_on_start"] == "True":
-            Path(self.output_path.text()).write_text("")
+        config.save(self.config)
 
         self.setup_cards()
 
@@ -367,21 +519,29 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.show_card()
 
     def on_finish(self):
-        (num_notes, num_ignored) = self.cards.save()
-        save_config(self.config)
+        self.cards.save()
         self.close()
 
-        save_msg = QtWidgets.QMessageBox(
-            QtWidgets.QMessageBox.NoIcon,
-            "Finished",
-            (
-                f"{num_notes} note(s) saved to {self.config['paths']['output']}\n"
-                f"{num_ignored} word(s) added to the ignore file\n"
-                "\nYou can now import into Anki"
-            ),
-            QtWidgets.QMessageBox.Ok,
-        )
-        save_msg.exec_()
+        message = []
+        if self.config.getboolean("add_to_anki", "enabled"):
+            message.append(f"{self.cards.num_added} note(s) added to anki")
+        if self.config.getboolean("output_csv", "enabled"):
+            message.append(
+                f"{self.cards.num_saved} note(s) saved to {self.config['output_csv']['file_path']}"
+            )
+        if self.config.getboolean("compare_ignore", "enabled"):
+            message.append(
+                f"{len(self.cards.new_ignored)} entries added to ignore file"
+            )
+
+        if len(message) > 0:
+            save_msg = QtWidgets.QMessageBox(
+                QtWidgets.QMessageBox.NoIcon,
+                "Finished",
+                "\n".join(message),
+                QtWidgets.QMessageBox.Ok,
+            )
+            save_msg.exec_()
 
 
 if __name__ == "__main__":

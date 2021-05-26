@@ -1,12 +1,9 @@
-import sqlite3
-
 import csv
 from dataclasses import dataclass, field
 from pathlib import Path
 import re
 
-from plover_cards.anki_utils import get_models
-
+from plover_cards import anki_utils
 
 NOTE_REPLACEMENTS = [
     ("&amp;", "&"),
@@ -15,25 +12,16 @@ NOTE_REPLACEMENTS = [
 ]
 
 
-def normalise_note(note):
-    translation = note[0]
+def normalise_text(text):
     for find, replace in NOTE_REPLACEMENTS:
-        translation = translation.replace(find, replace)
-    return translation.strip()
+        text = text.replace(find, replace)
+    return text.strip()
 
 
-def get_existing_notes(anki_path, note_type):
-    models = get_models(anki_path)
-    note_id = next((model.id for model in models if model.name == note_type))
+def get_existing_notes(query, compare_field):
+    notes = anki_utils.get_notes(query)
 
-    conn = sqlite3.connect(f"file:{anki_path}?mode=ro", uri=True)
-    with conn:
-        cursor = conn.cursor()
-
-        cursor.execute("select sfld from notes where mid=?;", [note_id])
-        notes = cursor.fetchall()
-
-    return set(map(normalise_note, notes))
+    return set(normalise_text(note["fields"][compare_field]["value"]) for note in notes)
 
 
 def get_ignored_from_file(ignore_file):
@@ -143,22 +131,35 @@ def create_cards(card_suggestions, ignored, new_notes):
 
 class Cards:
     def __init__(self, config, card_suggestions):
-        self.ignore_path = Path(config["paths"]["ignore"])
-        self.output_path = Path(config["paths"]["output"])
+        self.config = config
 
-        existing_notes = get_existing_notes(
-            config["paths"]["anki_collection"], config["anki"]["note_type"]
-        )
-        self.ignored = get_ignored_from_file(self.ignore_path)
+        ignored = set()
+        if self.config.getboolean("compare_ignore", "enabled"):
+            self.ignored = get_ignored_from_file(
+                Path(self.config["compare_ignore"]["file_path"])
+            )
+            ignored.update(self.ignored)
+        if self.config.getboolean("compare_to_anki", "enabled"):
+            ignored.update(
+                get_existing_notes(
+                    self.config["compare_to_anki"]["query"],
+                    self.config["compare_to_anki"]["compare_field"],
+                )
+            )
 
-        new_notes = get_new_notes(self.output_path)
+        new_notes = {}
+        if self.config.getboolean("output_csv", "enabled"):
+            new_notes = get_new_notes(Path(self.config["output_csv"]["file_path"]))
+
         (self.cards, self.num_ignored) = create_cards(
             card_suggestions,
-            existing_notes.union(self.ignored),
+            ignored,
             new_notes,
         )
 
         self.new_ignored = set()
+        self.num_saved = 0
+        self.num_added = 0
 
     def __getitem__(self, index):
         return self.cards[index]
@@ -177,17 +178,52 @@ class Cards:
         self.new_ignored.add(card.translation)
 
     def save(self):
-        self.output_path.parent.mkdir(parents=True, exist_ok=True)
-        notes = self._as_notes()
-        with self.output_path.open("a") as f:
-            f.write("\n".join(notes))
-            f.write("\n")
+        notes = []
 
-        all_ignored = self.ignored.union(self.new_ignored)
-        self.ignore_path.parent.mkdir(parents=True, exist_ok=True)
-        self.ignore_path.write_text("\n".join(sorted(list(all_ignored))))
+        if self.config.getboolean("output_csv", "enabled"):
+            output_path = Path(self.config["output_csv"]["file_path"])
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            notes = self._as_notes()
+            self.num_saved = len(notes)
 
-        return (len(notes), len(self.new_ignored))
+            mode = (
+                "w" if self.config["output_csv"]["write_method"] == "Overwrite" else "a"
+            )
+            with output_path.open(mode) as f:
+                f.write("\n".join(notes))
+                f.write("\n")
+
+        if self.config.getboolean("add_to_anki", "enabled"):
+            anki_settings = self.config["add_to_anki"]
+            added = anki_utils.invoke(
+                "addNotes",
+                notes=[
+                    {
+                        "deckName": anki_settings["deck"],
+                        "modelName": anki_settings["note_type"],
+                        "fields": {
+                            anki_settings["translation_field"]: card.translation,
+                            anki_settings["strokes_field"]: card.chosen_strokes,
+                        },
+                        "tags": anki_settings["tags"].split(" "),
+                        "options": {
+                            # Duplicates shouldn't be showing up, but in case they do,
+                            # I don't want this to blow up
+                            "allowDuplicate": True
+                        },
+                    }
+                    for card in self.cards
+                    if not card.ignored and card.chosen_strokes
+                ],
+            )
+
+            self.num_added = sum(1 for note in added if note != "null")
+
+        if self.config.getboolean("compare_ignore", "enabled"):
+            ignore_path = Path(self.config["compare_ignore"]["file_path"])
+            all_ignored = self.ignored.union(self.new_ignored)
+            ignore_path.parent.mkdir(parents=True, exist_ok=True)
+            ignore_path.write_text("\n".join(sorted(list(all_ignored))))
 
     def sort(self, *args, **kwargs):
         self.cards.sort(*args, **kwargs)

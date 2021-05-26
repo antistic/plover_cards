@@ -7,140 +7,360 @@
     <x>0</x>
     <y>0</y>
     <width>900</width>
-    <height>575</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources/resources.qrc">
+   <iconset resource="../resources/resources.qrc">
     <normaloff>:/plover_cards/cards.svg</normaloff>:/plover_cards/cards.svg</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QStackedWidget" name="pages">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_1">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <layout class="QFormLayout" name="layout">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Anki Collection</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout">
+        <widget class="QToolBox" name="settings">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="compare">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>856</width>
+            <height>426</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>Compare</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
-            <widget class="QLineEdit" name="anki_path"/>
-           </item>
-           <item>
-            <widget class="QPushButton" name="anki_browse">
+            <widget class="QCheckBox" name="use_ignore">
              <property name="text">
-              <string>Browse</string>
+              <string>Use ignore file</string>
              </property>
             </widget>
            </item>
-          </layout>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Note Type</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
-            <widget class="QComboBox" name="note_type"/>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QFormLayout" name="ignore_section">
+               <item row="0" column="0">
+                <widget class="QLabel" name="ignore_label">
+                 <property name="text">
+                  <string>Ignore File</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout">
+                 <item>
+                  <widget class="QLineEdit" name="ignore_path"/>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="ignore_browse">
+                   <property name="text">
+                    <string>Browse</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </item>
            <item>
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+            <widget class="QCheckBox" name="compare_to_anki">
+             <property name="text">
+              <string>Compare to Anki</string>
              </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QFormLayout" name="compare_to_anki_section">
+               <item row="0" column="0">
+                <widget class="QLabel" name="anki_query_label">
+                 <property name="text">
+                  <string>Query</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="anki_query"/>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="anki_compare_field_label">
+                 <property name="text">
+                  <string>Compare Field</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QComboBox" name="anki_compare_field"/>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>80</width>
-               <height>20</height>
+               <width>20</width>
+               <height>40</height>
               </size>
              </property>
             </spacer>
            </item>
           </layout>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Ignore File</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
+         </widget>
+         <widget class="QWidget" name="card_output">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>856</width>
+            <height>426</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>Card Output</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
-            <widget class="QLineEdit" name="ignore_path"/>
-           </item>
-           <item>
-            <widget class="QPushButton" name="ignore_browse">
+            <widget class="QCheckBox" name="output_to_csv">
              <property name="text">
-              <string>Browse</string>
+              <string>Output to CSV</string>
              </property>
             </widget>
            </item>
-          </layout>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Output File</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
-            <widget class="QLineEdit" name="output_path"/>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QFormLayout" name="output_section">
+               <item row="0" column="0">
+                <widget class="QLabel" name="output_label">
+                 <property name="text">
+                  <string>Output File</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_10">
+                 <item>
+                  <widget class="QLineEdit" name="output_path"/>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="output_browse">
+                   <property name="text">
+                    <string>Browse</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_12">
+                 <item>
+                  <widget class="QRadioButton" name="append_output">
+                   <property name="text">
+                    <string>Overwrite</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="overwrite_output">
+                   <property name="text">
+                    <string>Append</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_5">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="write_method_label">
+                 <property name="text">
+                  <string>Write Method</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </item>
            <item>
-            <widget class="QPushButton" name="output_browse">
+            <widget class="QCheckBox" name="add_to_anki">
              <property name="text">
-              <string>Browse</string>
+              <string>Add to Anki</string>
              </property>
             </widget>
            </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QFormLayout" name="add_anki_section">
+               <item row="0" column="0">
+                <widget class="QLabel" name="deck_label">
+                 <property name="text">
+                  <string>Deck</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="note_type_label">
+                 <property name="text">
+                  <string>Note Type</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="translation_field_label">
+                 <property name="text">
+                  <string>Translation Field</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QComboBox" name="translation_field"/>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="strokes_field_label">
+                 <property name="text">
+                  <string>Strokes Field</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="tags_label">
+                 <property name="text">
+                  <string>Tags</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="tags"/>
+               </item>
+               <item row="3" column="1">
+                <widget class="QComboBox" name="strokes_field"/>
+               </item>
+               <item row="0" column="1">
+                <widget class="QComboBox" name="deck"/>
+               </item>
+               <item row="1" column="1">
+                <widget class="QComboBox" name="note_type"/>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
           </layout>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="clear_output">
-         <property name="text">
-          <string>Clear output file before starting</string>
-         </property>
+         </widget>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item>
         <widget class="QPushButton" name="start">
@@ -292,8 +512,36 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>use_ignore</tabstop>
+  <tabstop>ignore_path</tabstop>
+  <tabstop>ignore_browse</tabstop>
+  <tabstop>compare_to_anki</tabstop>
+  <tabstop>anki_query</tabstop>
+  <tabstop>anki_compare_field</tabstop>
+  <tabstop>output_to_csv</tabstop>
+  <tabstop>output_path</tabstop>
+  <tabstop>output_browse</tabstop>
+  <tabstop>append_output</tabstop>
+  <tabstop>overwrite_output</tabstop>
+  <tabstop>add_to_anki</tabstop>
+  <tabstop>deck</tabstop>
+  <tabstop>note_type</tabstop>
+  <tabstop>translation_field</tabstop>
+  <tabstop>strokes_field</tabstop>
+  <tabstop>tags</tabstop>
+  <tabstop>start</tabstop>
+  <tabstop>card_view</tabstop>
+  <tabstop>suggestions</tabstop>
+  <tabstop>custom_strokes</tabstop>
+  <tabstop>clear_card</tabstop>
+  <tabstop>ignore_card</tabstop>
+  <tabstop>prev_card</tabstop>
+  <tabstop>next_card</tabstop>
+  <tabstop>finish</tabstop>
+ </tabstops>
  <resources>
-  <include location="resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>
