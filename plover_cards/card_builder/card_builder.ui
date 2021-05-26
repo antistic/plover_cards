@@ -225,14 +225,14 @@
                <item row="1" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_12">
                  <item>
-                  <widget class="QRadioButton" name="append_output">
+                  <widget class="QRadioButton" name="overwrite_output">
                    <property name="text">
                     <string>Overwrite</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QRadioButton" name="overwrite_output">
+                  <widget class="QRadioButton" name="append_output">
                    <property name="text">
                     <string>Append</string>
                    </property>
@@ -522,8 +522,8 @@
   <tabstop>output_to_csv</tabstop>
   <tabstop>output_path</tabstop>
   <tabstop>output_browse</tabstop>
-  <tabstop>append_output</tabstop>
   <tabstop>overwrite_output</tabstop>
+  <tabstop>append_output</tabstop>
   <tabstop>add_to_anki</tabstop>
   <tabstop>deck</tabstop>
   <tabstop>note_type</tabstop>
