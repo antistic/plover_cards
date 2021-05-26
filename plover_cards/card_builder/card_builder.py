@@ -11,143 +11,8 @@ from plover_cards.plover_hook.card_suggestions import CardSuggestions
 
 from .cards import Cards
 from .card_builder_ui import Ui_CardBuilder
-
-
-COLUMNS = [
-    {
-        "name": "Count",
-        "value": lambda card: card.frequency,
-        "sort_key": lambda card: card.frequency,
-    },
-    {
-        "name": "Count\n(shorter)",
-        "value": lambda card: card.frequency_shorter,
-        "sort_key": lambda card: card.frequency_shorter,
-    },
-    {
-        "name": "Last Used",
-        "value": lambda card: QtCore.QDateTime.fromSecsSinceEpoch(
-            int(card.last_updated)
-        )
-        if card.last_updated
-        else "",
-        "sort_key": lambda card: card.last_updated if card.last_updated else 0,
-    },
-    {
-        "name": "Translation",
-        "value": lambda card: card.translation,
-        "sort_key": lambda card: card.translation.lower(),
-    },
-    {
-        "name": "Strokes",
-        "value": lambda card: "(ignored)" if card.ignored else card.chosen_strokes,
-        "sort_key": lambda card: card.chosen_strokes if card.chosen_strokes else "",
-    },
-    {
-        "name": "Similar\nIgnored",
-        "value": lambda card: ", ".join(card.similar_ignored),
-        "sort_key": lambda card: card.similar_ignored if card.similar_ignored else [],
-    },
-]
-
-
-class CardTableModel(QtCore.QAbstractTableModel):
-    # pylint: disable=no-self-use
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.cards = None
-
-    def set_cards_(self, cards):
-        self.cards = cards
-        self.sort(0, QtCore.Qt.DescendingOrder)
-
-    def refresh_(self, card_index):
-        self.dataChanged.emit(
-            self.index(card_index, 0),
-            self.index(card_index, self.columnCount()),
-        )
-
-    def rowCount(self, _parent=None):  # pylint: disable=invalid-name
-        return len(self.cards)
-
-    def columnCount(self, _parent=None):  # pylint: disable=invalid-name
-        return len(COLUMNS)
-
-    def data(self, index, role):
-        if role != QtCore.Qt.DisplayRole:
-            return QtCore.QVariant()
-        card = self.cards[index.row()]
-
-        return COLUMNS[index.column()]["value"](card)
-
-    def headerData(self, column, orientation, role):  # pylint: disable=invalid-name
-        if role != QtCore.Qt.DisplayRole or orientation != QtCore.Qt.Horizontal:
-            return QtCore.QVariant()
-
-        return COLUMNS[column]["name"]
-
-    def sort(self, column, order=QtCore.Qt.AscendingOrder):
-        self.cards.sort(
-            key=COLUMNS[column]["sort_key"], reverse=order == QtCore.Qt.DescendingOrder
-        )
-        self.dataChanged.emit(
-            self.index(0, 0),
-            self.index(self.rowCount(), self.columnCount()),
-        )
-
-
-def setup_checkbox_section(checkbox, section):
-    def action():
-        if checkbox.isChecked():
-            for item in section:
-                item.setEnabled(True)
-        else:
-            for item in section:
-                item.setEnabled(False)
-
-    action()
-    checkbox.stateChanged.connect(action)
-
-
-def setup_browse(parent, button, line_edit, title, location, extensions):
-    def action():
-        filename = QtWidgets.QFileDialog.getOpenFileName(
-            parent, title, location, f"{extensions};;All Files (*)"
-        )[0]
-        line_edit.setText(filename)
-
-    button.clicked.connect(action)
-
-
-def on_checkbox(checkbox, on_checked, on_unchecked):
-    def action():
-        if checkbox.isChecked():
-            on_checked()
-        else:
-            on_unchecked()
-
-    action()
-    checkbox.stateChanged.connect(action)
-
-
-def on_combobox(combobox, on_new_text, on_clear):
-    def action(new_text):
-        if new_text == "":
-            on_clear()
-        else:
-            on_new_text(new_text)
-
-    action(combobox.currentText())
-    combobox.currentTextChanged.connect(action)
-
-
-def combobox_set_items(combobox, new_items, default):
-    combobox.clear()
-    combobox.insertItems(0, new_items)
-
-    index = combobox.findText(default)
-    if index > -1:
-        combobox.setCurrentIndex(index)
+from .card_table_model import COLUMNS, CardTableModel
+from . import utils
 
 
 class CardBuilder(Tool, Ui_CardBuilder):
@@ -247,10 +112,10 @@ class CardBuilder(Tool, Ui_CardBuilder):
         self.config_connect(self.tags, "add_to_anki", "tags")
 
         # set up sections
-        setup_checkbox_section(
+        utils.setup_checkbox_section(
             self.use_ignore, [self.ignore_label, self.ignore_path, self.ignore_browse]
         )
-        setup_checkbox_section(
+        utils.setup_checkbox_section(
             self.compare_to_anki,
             [
                 self.anki_query_label,
@@ -259,7 +124,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
                 self.anki_compare_field,
             ],
         )
-        setup_checkbox_section(
+        utils.setup_checkbox_section(
             self.output_to_csv,
             [
                 self.output_label,
@@ -270,7 +135,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
                 self.append_output,
             ],
         )
-        setup_checkbox_section(
+        utils.setup_checkbox_section(
             self.add_to_anki,
             [
                 self.deck_label,
@@ -287,7 +152,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
         )
 
         # set up browse
-        setup_browse(
+        utils.setup_browse(
             self,
             self.ignore_browse,
             self.ignore_path,
@@ -295,7 +160,7 @@ class CardBuilder(Tool, Ui_CardBuilder):
             PLOVER_CONFIG_DIR,
             "Text Files (*.txt)",
         )
-        setup_browse(
+        utils.setup_browse(
             self,
             self.output_browse,
             self.output_path,
@@ -316,45 +181,45 @@ class CardBuilder(Tool, Ui_CardBuilder):
             self.add_to_anki.setEnabled(False)
 
         # set up comboboxes
-        on_checkbox(
+        utils.on_checkbox(
             self.compare_to_anki,
-            lambda: combobox_set_items(
+            lambda: utils.combobox_set_items(
                 self.anki_compare_field,
                 anki_utils.all_field_names(),
                 self.config["compare_to_anki"]["compare_field"],
             ),
             self.deck.clear,
         )
-        on_checkbox(
+        utils.on_checkbox(
             self.add_to_anki,
-            lambda: combobox_set_items(
+            lambda: utils.combobox_set_items(
                 self.deck,
                 anki_utils.invoke("deckNames"),
                 self.config["add_to_anki"]["deck"],
             ),
             self.deck.clear,
         )
-        on_checkbox(
+        utils.on_checkbox(
             self.add_to_anki,
-            lambda: combobox_set_items(
+            lambda: utils.combobox_set_items(
                 self.note_type,
                 anki_utils.invoke("modelNames"),
                 self.config["add_to_anki"]["note_type"],
             ),
             self.note_type.clear,
         )
-        on_combobox(
+        utils.on_combobox(
             self.note_type,
-            lambda new_text: combobox_set_items(
+            lambda new_text: utils.combobox_set_items(
                 self.translation_field,
                 anki_utils.invoke("modelFieldNames", modelName=new_text),
                 self.config["add_to_anki"]["translation_field"],
             ),
             self.translation_field.clear,
         )
-        on_combobox(
+        utils.on_combobox(
             self.note_type,
-            lambda new_text: combobox_set_items(
+            lambda new_text: utils.combobox_set_items(
                 self.strokes_field,
                 anki_utils.invoke("modelFieldNames", modelName=new_text),
                 self.config["add_to_anki"]["strokes_field"],
