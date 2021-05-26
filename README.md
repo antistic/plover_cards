@@ -4,6 +4,12 @@ A Plover plugin which helps you make cards for flashcard programs like Anki.
 
 ![screenshot of card builder window](https://user-images.githubusercontent.com/3298461/119559105-264b1480-bd9a-11eb-8509-c2e97e1bafbc.png)
 
+## Table of Contents
+- [Setup](#setup)
+- [Plover Cards Hook](#plover-cards-hook)
+- [Card Builder](#card-builder)
+- [ANKI_ADD_CARD Command](#anki_add_card-command)
+
 ## Setup
 
 - Enable "plover_cards_hook"
@@ -81,3 +87,13 @@ You can change the column size by dragging the edges of the column title.
   - **<**: Go to previous card
   - **>**: Go to next card
   - **Finish**: Finish building cards. Depending on your settings, it will output to CSV and/or add cards to anki
+
+## ANKI_ADD_CARD Command
+
+You can add dictionary entries to add cards to Anki.
+
+`{PLOVER:ANKI_ADD_CARD}` will open up the Anki Add Cards window with the last used word and a list of stroke suggestions.
+
+`{PLOVER:ANKI_ADD_CARD:X}` will do the same but for the last `X` words.
+
+It will use the same settings as in the "Add to Anki" section in the card builder (deck, note_type, translation_field, strokes_field, tags).
