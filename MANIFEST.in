@@ -1,4 +1,4 @@
-exclude plover_cards/*_rc.py
-exclude plover_cards/*_ui.py
-include plover_cards/*.ui
-recursive-include plover_cards/resources *
+exclude plover_cards/card_builder/*_rc.py
+exclude plover_cards/card_builder/*_ui.py
+include plover_cards/card_builder/*.ui
+recursive-include plover_cards/card_builder/resources *
