@@ -2,6 +2,7 @@ import csv
 from dataclasses import dataclass, field
 from pathlib import Path
 import re
+from typing import List
 
 from plover_cards import anki_utils
 
@@ -47,13 +48,13 @@ def get_new_notes(new_notes_file):
 @dataclass
 class Card:
     translation: str
-    stroke_suggestions: list[str]
+    stroke_suggestions: List[str]
     frequency: int
     frequency_shorter: int
     last_updated: int
     chosen_strokes: str = None
     ignored: bool = False
-    similar_ignored: list[str] = field(default_factory=list)
+    similar_ignored: List[str] = field(default_factory=list)
 
     def choose_strokes(self, strokes):
         self.ignored = False
